@@ -16,3 +16,5 @@ def get_db(app):
     app.config["SQLALCHEMY_DATABASE_URI"] = uri
 
     return SQLAlchemy(app)
+
+

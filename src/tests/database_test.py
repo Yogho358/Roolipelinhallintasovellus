@@ -1,27 +1,44 @@
+
 import unittest
 from flask import Flask
 from db import get_db
+from users import register_user
 
-def set_db():
-    app = Flask(__name__)
-    return get_db(app)
 
-class TestDBTesting(unittest.TestCase):
+app = Flask(__name__)
+db = get_db(app)
+
+def drop_tables():
+    db.session.execute("DROP TABLE IF EXISTS test;")
+    db.session.execute("DROP TABLE IF EXISTS users;")
+
+class TestStuff(unittest.TestCase):
     
 
-    def setUp(self):
-
-        self.db = set_db()
+    def setUp(self): 
         
-        self.db.session.execute("DROP TABLE IF EXISTS test;")
-        self.db.session.execute("DROP TABLE IF EXISTS users;")
-        self.db.session.execute("CREATE TABLE test (id SERIAL PRIMARY KEY, txt TEXT);")
-        self.db.session.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT, password TEXT);")
+        db.session.execute("DROP TABLE IF EXISTS test;")
+        db.session.execute("DROP TABLE IF EXISTS users;")
+        db.session.execute("CREATE TABLE test (id SERIAL PRIMARY KEY, txt TEXT);")
+        db.session.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT, password TEXT);")
 
     def test_db_testing(self):
-
-        self.db.session.execute("INSERT INTO test (txt) VALUES ('testi')")
-        result = self.db.session.execute("SELECT * FROM test")
+        print("tuli")
+        db.session.execute("INSERT INTO test (txt) VALUES ('testi');")
+        result = db.session.execute("SELECT * FROM test;")
         res = result.fetchall()
+        drop_tables()
         self.assertEqual(res[0].txt, "testi")
+
+    def test_should_save_user_to_db_on_registration(self):
+        
+        register_user(db,"testman", "password")
+        result = db.session.execute("SELECT * FROM users;")
+        users = result.fetchall()
+        drop_tables()
+        self.assertEqual(len(users), 1)
+
+
+        
+
 
