@@ -1,7 +1,9 @@
 from flask import Flask
+from src.routes import configure_routes
+
 
 
 app = Flask(__name__)
 
-import src.routes
+configure_routes(app)
 
