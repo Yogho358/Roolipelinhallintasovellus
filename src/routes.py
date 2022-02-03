@@ -13,6 +13,7 @@ db = SQLAlchemy(app)
 
 @app.route("/")
 def index():
-    result = db.session.execute("SELECT txt FROM test")
-    messages = result.fetchall()
-    return render_template("index.html", count=len(messages), messages=messages)
+    db.session.execute("INSERT INTO test (txt) VALUES ('testi')");
+    result = db.session.execute("SELECT * FROM test")
+    res = result.fetchone()
+    return render_template("index.html", res = res)
