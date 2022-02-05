@@ -1,5 +1,6 @@
 
 import unittest
+import characters
 from flask import Flask
 from db import get_db
 from users import register_user, login_user
@@ -14,6 +15,7 @@ def register_testman():
 def drop_tables():
     db.session.execute("DROP TABLE IF EXISTS test;")
     db.session.execute("DROP TABLE IF EXISTS users;")
+    db.session.execute("DROP TABLE IF EXISTS characters;")
 
 class TestStuff(unittest.TestCase):
     
@@ -21,10 +23,10 @@ class TestStuff(unittest.TestCase):
 
     def setUp(self): 
         
-        db.session.execute("DROP TABLE IF EXISTS test;")
-        db.session.execute("DROP TABLE IF EXISTS users;")
+        drop_tables()
         db.session.execute("CREATE TABLE test (id SERIAL PRIMARY KEY, txt TEXT);")
         db.session.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT, password TEXT);")
+        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, name TEXT);")
 
     def test_db_testing(self):
         db.session.execute("INSERT INTO test (txt) VALUES ('testi');")
@@ -56,10 +58,10 @@ class TestStuff(unittest.TestCase):
         drop_tables()
         self.assertEqual(len(users), 0)
 
-    def test_login_user_should_return_true_with_correct_credentials(self):
+    def test_login_user_should_return_usr_object_with_correct_credentials(self):
         register_testman()
         res = login_user(db, "testman", "password")
-        self.assertEqual(res, True)
+        self.assertEqual(res.id, 1)
 
     def test_should_raise_exception_when_login_non_existing(self):
         with self.assertRaises(Exception):
@@ -69,5 +71,12 @@ class TestStuff(unittest.TestCase):
         register_testman()
         with self.assertRaises(Exception):
             login_user(db, "testman", "password1")
+
+    def test_should_save_character_to_db(self):
+        characters.create_character(db, "test")
+        result = db.session.execute("SELECT * FROM characters;")
+        chars = result.fetchall()
+        drop_tables()
+        self.assertEqual(len(chars), 1)
 
 

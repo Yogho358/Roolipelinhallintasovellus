@@ -1,7 +1,8 @@
 
 from flask import redirect, render_template, request, session
-from os import getenv
-from src.users import register_user, login_user
+import src.users as users
+from os import getenv, urandom
+
 
 
 def configure_routes(app, db):
@@ -11,9 +12,8 @@ def configure_routes(app, db):
     @app.route("/")
     def index():
         
-        
-        if session:
-            return render_template("frontpage.html", session = session)
+        if session and session["username"]:
+            return render_template("frontpage.html")
         else:
             return redirect("/login")
         
@@ -27,14 +27,17 @@ def configure_routes(app, db):
             password = request.form["password"]
 
             try:
-                login_user(db, username, password)
-                session["username"] = username
+               user = users.login_user(db, username, password)
+               session["user_id"] = user.id
+               session["username"] = user.username
+               session["csrf"] = urandom(16).hex()
+               return redirect("/")
             except Exception as e:
                 print(e)
-
+                return redirect("/")
             
         
-            return redirect("/")
+            
 
     @app.route("/register", methods = ["GET", "POST"])
     def register():
@@ -45,13 +48,25 @@ def configure_routes(app, db):
             username = request.form["username"]
             password1 = request.form["password1"]
             password2 = request.form["password2"]
-            register_user(db, username, password1, password2)
+            users.register_user(db, username, password1, password2)
             return redirect("/")
 
     @app.route("/logout")
     def logout():
+        del session["user_id"]
         del session["username"]
+        del session["csrf"]
         return redirect("/")
+
+    @app.route("/characters")
+    def characters():
+        return render_template("characters.html")
+
+    @app.route("/newcharacter", methods = ["GET", "POST"])
+    def newcharacter():
+        if request.method == "GET":
+            return render_template("newcharacter.html")
+
 
 
 

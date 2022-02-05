@@ -1,4 +1,6 @@
+
 from werkzeug.security import check_password_hash, generate_password_hash
+
 
 def register_user(db, username, password1, password2):
     if password1 != password2:
@@ -14,13 +16,13 @@ def login_user(db, username, password):
     sql = "SELECT * FROM users WHERE username=:username"
     result = db.session.execute(sql, {"username":username})
     user = result.fetchone()
-    print(user)
     if not user:
         raise Exception(f"Käyttäjää {username} ei ole olemassa")
 
     hash_value = user.password
     if not check_password_hash(hash_value, password):
         raise Exception("Salasana on väärä")
-    return True
+
+    return user
 
 
