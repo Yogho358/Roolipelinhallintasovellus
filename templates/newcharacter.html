@@ -1,1 +1,9 @@
 <h1>Luo uusi hahmo</h1>
+
+<form action="/newcharacter" method = "POST">
+    <p>Nimi:<br>
+    <input type="text" name="character_name">
+    <input type="submit" value="Luo">
+    </p>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>

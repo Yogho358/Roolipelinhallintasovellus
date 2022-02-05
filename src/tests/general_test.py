@@ -26,7 +26,7 @@ class TestStuff(unittest.TestCase):
         drop_tables()
         db.session.execute("CREATE TABLE test (id SERIAL PRIMARY KEY, txt TEXT);")
         db.session.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT, password TEXT);")
-        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, name TEXT);")
+        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY,user_id INTEGER, name TEXT);")
 
     def test_db_testing(self):
         db.session.execute("INSERT INTO test (txt) VALUES ('testi');")
@@ -61,6 +61,7 @@ class TestStuff(unittest.TestCase):
     def test_login_user_should_return_usr_object_with_correct_credentials(self):
         register_testman()
         res = login_user(db, "testman", "password")
+        drop_tables()
         self.assertEqual(res.id, 1)
 
     def test_should_raise_exception_when_login_non_existing(self):
@@ -71,12 +72,20 @@ class TestStuff(unittest.TestCase):
         register_testman()
         with self.assertRaises(Exception):
             login_user(db, "testman", "password1")
+        drop_tables()
 
-    def test_should_save_character_to_db(self):
-        characters.create_character(db, "test")
+    def test_create_character_should_save_character_to_db(self):
+        register_testman()
+        characters.create_character(db, 1, "test")
         result = db.session.execute("SELECT * FROM characters;")
         chars = result.fetchall()
         drop_tables()
         self.assertEqual(len(chars), 1)
 
-
+    def test_get_users_characters_should_return_list_of_all_characters_of_a_user(self):
+        characters.create_character(db, 1, "test")
+        characters.create_character(db, 1, "test")
+        characters.create_character(db, 2, "test")
+        res = characters.get_users_characters(db, 1)
+        drop_tables()
+        self.assertEqual(len(res), 2)
