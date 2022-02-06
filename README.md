@@ -15,3 +15,15 @@ Pelinjohtaja voi:
 
 * Luoda vihollisia, aseita, taitoja ja areenoita
 * Luoda taistelutilanteita yhdistelemällä pelihahmoja, vihollisia ja areenoita, jolloin hän saa tietoja kuinka areena vaikuttaa pelihahmojen aseisiin ja taitoihin
+
+# Välipalautus 1
+
+Sovellus on osoitteessa https://powerful-cliffs-38993.herokuapp.com/
+
+Sovellusta käyttääkseen on pakko kirjautua sisään, ja tarkoituksena on, että minkä tahansa yrittäminen ilman sisäänkirjautumista ohjaa käyttäjän login-sivulle. Sovelluksessa on nyt valmiina kaksi käyttäjää, käyttäjänimet testman ja test, molempien salasana on test. Uusia käyttäjiä voi rekisteröidä vapaasti.
+
+### Nykytilanne
+
+Käyttäjät voivat luoda hahmoja ja tarkastella niiden tietoja, mutta tietoja ei voi vielä muuttaa eikä hahmolla tehdä mitään. Jokainen käyttäjä voi luoda pelejä, joiden pelinjohtajaksi hän tulee, ja nähdä listan olemassaolevista peleistä, joihin hän voi liittyä pelaajaksi, tai jättää pelin.
+
+Ulkoasun toteutus on sen verran alkutekijöissään, että lähes kaikki on hajautettu omille sivuilleen eikä mitään järkevää navigoimista voi tehdä. Virheellisistä syötteistä yms. ei vielä tule käyttäjälle hyvää viestiä, mutta olemassaolevien toimintojen toimivuus ja turvallisuus on otettu huomioon, paitsi tekstisyötteiden tarkastusta ei vielä ole.
