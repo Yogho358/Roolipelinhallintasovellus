@@ -11,7 +11,6 @@ def configure_routes(app, db):
     app.secret_key = getenv("SECRET_KEY")
 
     def check_user():
-        print(session)
         if session and session["username"]:
             return True
         else:
@@ -93,6 +92,12 @@ def configure_routes(app, db):
             character_repository.create_character(db, session["user_id"], name)
             return redirect("/characters")
 
-
-
+    @app.route("/character/<int:character_id>")
+    def show_character(character_id):
+        if not check_user():
+            return redirect("/login")
+        character = character_repository.get_character(db, character_id)
+        if character.user_id != session["user_id"]:
+            return redirect("/")
+        return render_template("character.html", character = character)
 

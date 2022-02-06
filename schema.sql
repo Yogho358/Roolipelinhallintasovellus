@@ -8,4 +8,4 @@ CREATE TABLE test (id SERIAL PRIMARY KEY, txt TEXT);
 
 CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT UNIQUE, password TEXT);
 
-CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT);
+CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT, current_hp INTEGER, max_hp INTEGER);

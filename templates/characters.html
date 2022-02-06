@@ -1,7 +1,7 @@
 <h1>Omat hahmot</h1>
 <ul>
     {% for character in characters %}
-<li>{{ character.name }}</li>
+<li><a href="/character/{{ character.id }}">{{character.name}}</a>
     {% endfor %}
 </ul>
 
