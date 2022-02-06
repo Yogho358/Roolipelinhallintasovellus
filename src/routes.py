@@ -61,11 +61,15 @@ def configure_routes(app, db):
             return render_template("register.html")
 
         if request.method == "POST":
-            username = request.form["username"]
-            password1 = request.form["password1"]
-            password2 = request.form["password2"]
-            users.register_user(db, username, password1, password2)
-            return redirect("/")
+            try:
+                username = request.form["username"]
+                password1 = request.form["password1"]
+                password2 = request.form["password2"]
+                users.register_user(db, username, password1, password2)
+                return redirect("/")
+            except Exception as e:
+                print(e)
+                return redirect("/")
 
     @app.route("/logout")
     def logout():
@@ -114,11 +118,33 @@ def configure_routes(app, db):
         game_repository.create_game(db, name, session["user_id"])
         return redirect("/")
 
-    @app.route("/gameinfo/<int:game_id>")
+    @app.route("/gameinfo/<int:game_id>", methods = ["GET", "POST"])
     def game_info(game_id):
         if not check_user():
             return redirect("/login")
-        game = game_repository.get_game(db, game_id)
-        game_master = users.get_user(db, game.game_master_id)
-        return render_template("game_info.html", game = game, game_master = game_master)
+        
+        if request.method == "GET":
+            game = game_repository.get_game(db, game_id)
+            game_master = users.get_user(db, game.game_master_id)
+            players = game_repository.get_players_for_game(db, game_id)
+            in_game = game_repository.check_if_in_game(db, session["user_id"], game_id)
+            return render_template("game_info.html", game = game, game_master = game_master, players = players, in_game = in_game)
+        
+        if request.method == "POST":
+            check_csrf()
+            try:
+                game_repository.add_player_to_game(db, session["user_id"], game_id)
+                return redirect(f"/gameinfo/{game_id}")
+            except Exception as e:
+                print(e)
+                return redirect("/")
 
+    @app.route("/leavegame/<int:game_id>", methods = ["POST"])
+    def leave_game(game_id):
+        if not check_user():
+            return redirect("/login")
+        check_csrf()
+        game_repository.remove_player_from_game(db, session["user_id"], game_id)
+        return redirect(f"/gameinfo/{game_id}")
+
+    

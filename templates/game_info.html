@@ -4,7 +4,23 @@
     <p>Pelaajat:</p>
     <ul>
         {% for player in players %}
-    <li>{{player.name}}</a>
+    <li>{{player.username}}</a>
         {% endfor %}
     </ul>
+{% endif %}
+
+{% if in_game %}
+
+<form action ="/leavegame/{{ game.id }}" method = "POST">
+    <input type = "submit" value = "Poistu pelistä">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+
+{% else %}
+
+<form action = "/gameinfo/{{ game.id }}" method = "POST">
+    <input type = "submit" value = "Liity peliin">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+
 {% endif %}

@@ -12,12 +12,22 @@ app = Flask(__name__)
 db = get_db(app)
 
 def register_testman():
-        register_user(db, "testman", "password", "password")
+    register_user(db, "testman", "password", "password")
+
+def register_3_users():
+    register_testman()
+    register_user(db, "testman2", "password", "password")
+    register_user(db, "testman3", "password", "password")
 
 def create_3_games():
     games.create_game(db, "testgame", 1)
     games.create_game(db, "testgame2", 1)
     games.create_game(db, "testgame3", 2)
+
+def add_3_users_to_games():
+    games.add_player_to_game(db, 2, 1)
+    games.add_player_to_game(db, 3, 1)
+    games.add_player_to_game(db, 1, 2)
 
 def drop_tables():
     db.session.execute("DROP TABLE IF EXISTS test;")
@@ -131,9 +141,7 @@ class TestStuff(unittest.TestCase):
         self.assertEqual(user.username, "testman")
 
     def test_get_players_for_game_should_return_list_of_all_players_in_a_game_by_game_id(self):
-        register_testman()
-        register_user(db, "testman2", "password", "password")
-        register_user(db, "testman3", "password", "password")
+        register_3_users()
         create_3_games()
         db.session.execute("INSERT INTO playersingames (user_id, game_id) VALUES (2,1);")
         db.session.execute("INSERT INTO playersingames (user_id, game_id) VALUES (3,1);")
@@ -142,3 +150,29 @@ class TestStuff(unittest.TestCase):
         self.assertEqual(len(players_in_game_1), 2)
         players_in_game_2 = games.get_players_for_game(db, 2)
         self.assertEqual(len(players_in_game_2), 1)
+
+    def test_add_players_to_game_should_save_info_to_playersingames(self):
+        register_3_users()
+        create_3_games()
+        add_3_users_to_games()
+        players_in_game_1 = games.get_players_for_game(db, 1)
+        self.assertEqual(len(players_in_game_1), 2)
+        players_in_game_2 = games.get_players_for_game(db, 2)
+        self.assertEqual(len(players_in_game_2), 1)
+
+    def test_should_not_be_able_to_add_player_to_game_more_than_once(self):
+        register_3_users()
+        create_3_games()
+        add_3_users_to_games()
+        with self.assertRaises(Exception):
+            games.add_player_to_game(db, 2, 1)
+        players_in_game_1 = games.get_players_for_game(db, 1)
+        self.assertEqual(len(players_in_game_1), 2)
+
+    def test_remove_player_from_game_should_remove_user_from_playersingames(self):
+        register_3_users()
+        create_3_games()
+        add_3_users_to_games()
+        games.remove_player_from_game(db, 2, 1)
+        players_in_game_1 = games.get_players_for_game(db, 1)
+        self.assertEqual(len(players_in_game_1), 1)
