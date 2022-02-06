@@ -18,11 +18,14 @@ def login_user(db, username, password):
     user = result.fetchone()
     if not user:
         raise Exception(f"Käyttäjää {username} ei ole olemassa")
-
     hash_value = user.password
     if not check_password_hash(hash_value, password):
         raise Exception("Salasana on väärä")
-
     return user
+
+def get_user(db, id):
+    sql = "SELECT id, username FROM users WHERE id=:id"
+    result = db.session.execute(sql, {"id":id})
+    return result.fetchone()
 
 

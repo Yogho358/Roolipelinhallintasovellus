@@ -1,4 +1,36 @@
 <title>Roolipelisovellus</title>
 <h1>Tervetuloa, {{ session.username }}</h1>
 <a href = "/characters">Pelihahmot</a>
+
+<form action = "/newgame" method = "POST">
+    <h3>Luo uusi peli <br>
+    <input type = "text" name = "new_game_name">
+    <input type = "submit" value = "luo">
+    </h3>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+
+{% if mastered_games %}
+<p>Johdetut pelit:</p>
+
+<ul>
+    {% for game in mastered_games %}
+<li>{{ game.name }}</a>
+    {% endfor %}
+</ul>
+
+{% endif %}
+
+{% if all_games %}
+
+<p>Kaikki pelit:</p>
+
+<ul>
+    {% for game in all_games %}
+    <li><a href = "/gameinfo/{{ game.id }}">{{ game.name }}</a>
+    {% endfor %}
+</ul>
+
+{% endif %}
+
 <a href = "/logout">Kirjaudu ulos</a>

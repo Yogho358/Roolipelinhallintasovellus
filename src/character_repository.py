@@ -1,4 +1,3 @@
-from select import select
 
 
 def create_character(db, user_id, name, hp = 20):

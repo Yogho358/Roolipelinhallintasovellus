@@ -1,7 +1,8 @@
 
 from flask import redirect, render_template, request, session, abort
 import src.users as users
-import src.characters as character_repository
+import src.character_repository as character_repository
+import src.games as game_repository
 from os import getenv, urandom
 
 
@@ -26,7 +27,10 @@ def configure_routes(app, db):
         if not check_user():
             return redirect("/login")
         
-        return render_template("frontpage.html")
+        mastered_games = game_repository.get_mastered_games(db, session["user_id"])
+        all_games = game_repository.get_all_games(db)
+        
+        return render_template("frontpage.html", mastered_games = mastered_games, all_games = all_games)
         
         
     @app.route("/login", methods = ["GET", "POST"])
@@ -100,4 +104,21 @@ def configure_routes(app, db):
         if character.user_id != session["user_id"]:
             return redirect("/")
         return render_template("character.html", character = character)
+
+    @app.route("/newgame", methods = ["POST"])
+    def new_game():
+        if not check_user():
+            return redirect("/login")
+        check_csrf()
+        name = request.form["new_game_name"]
+        game_repository.create_game(db, name, session["user_id"])
+        return redirect("/")
+
+    @app.route("/gameinfo/<int:game_id>")
+    def game_info(game_id):
+        if not check_user():
+            return redirect("/login")
+        game = game_repository.get_game(db, game_id)
+        game_master = users.get_user(db, game.game_master_id)
+        return render_template("game_info.html", game = game, game_master = game_master)
 

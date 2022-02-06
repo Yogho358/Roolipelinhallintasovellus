@@ -1,0 +1,10 @@
+<h1>{{ game.name }}</h1>
+<p>Pelinjohtaja: {{ game_master.username }}</p>
+{% if players %}
+    <p>Pelaajat:</p>
+    <ul>
+        {% for player in players %}
+    <li>{{player.name}}</a>
+        {% endfor %}
+    </ul>
+{% endif %}
