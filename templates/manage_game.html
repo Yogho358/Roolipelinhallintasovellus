@@ -1,13 +1,40 @@
 <h1>{{game.name}}</h1>
 
+<h3>Pelaajat pelissä:</h3>
 <ul>
     {% for user in players %}
 <li>{{ user.username }}</a>
     {% endfor %}
 </ul>
 
+<h3>Pelissä käytettävät aseet:</h3>
+<form action ="/removeweaponfromgame/{{game.id}}" method = "POST">
 <ul>
     {% for weapon in weapons %}
-<li>{{ weapon.name }}</a>
+<li>{{ weapon.name }} <button type="submit" name="weapon_id" value="{{weapon.id}}">Poista</button></a>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     {% endfor %}
 </ul>
+
+
+</form>
+
+<h3>Lisää ase peliin:</h3>
+
+{% if available_weapons %}
+
+<form action = "/addweapontogame/{{game.id}}" method = "POST">
+<select name=weapons>
+    {% for weapon in available_weapons %}
+        <option value="{{ weapon.id }}">{{ weapon.name }}</option>
+    {% endfor %}
+</select>
+<input type="submit" value="Lisää">
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+
+{% else %}
+
+<p>Ei lisättäviä aseita</p>
+
+{% endif %}

@@ -30,5 +30,5 @@ CREATE TABLE weaponsingames (weapon_id INTEGER REFERENCES weapons, game_id INTEG
 
 INSERT INTO weapons (name, min_damage, max_damage, attack_modifier, defence_modifier, size, description) VALUES ('pitkämiekka', 2, 6, 50, 50, 'big', 'miekka, joka on pitkä');
 
-INSERT INTO weapons (name, min_damage, max_damage, attack_modifier, defence_modifier, size, description) VALUES ('perhosmiekat', 2, 6, 50, 50, 'big', 'yksi per käsi');
+INSERT INTO weapons (name, min_damage, max_damage, attack_modifier, defence_modifier, size, description) VALUES ('perhosmiekat', 2, 6, 50, 50, 'small', 'yksi per käsi');
 

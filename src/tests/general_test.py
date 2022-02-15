@@ -33,6 +33,10 @@ def add_3_users_to_games():
 def create_character():
     character_repository.create_character(db, 1, "test")
 
+def create_two_weapons():
+    weapons.create_weapon(db, "pitkämiekka", 2, 6, 50, 50, "big", "miekka,joka on pitkä")
+    weapons.create_weapon(db, 'perhosmiekat', 2, 6, 50, 50, 'big', 'yksi per käsi')
+
 def drop_tables():
     db.session.execute("DROP TABLE IF EXISTS playersingames;")
     db.session.execute("DROP TABLE IF EXISTS weaponsingames;")
@@ -145,7 +149,7 @@ class TestStuff(unittest.TestCase):
         game = games.get_game(db, 2)
         self.assertEqual(game.name, "testgame2")
 
-    def test_get_user_should_return_user_by_idfrom_db(self):
+    def test_get_user_should_return_user_by_id_from_db(self):
         register_testman()
         user = get_user(db, 1)
         self.assertEqual(user.username, "testman")
@@ -212,3 +216,32 @@ class TestStuff(unittest.TestCase):
         result = db.session.execute("SELECT * FROM weapons;")
         res = result.fetchall()
         self.assertEqual(res[0].name, "longsword")
+
+    def test_get_available_weapons_for_games_should_return_all_weapons_with_empty_input(self):
+        create_two_weapons()
+        res = games.get_weapons_available_for_game(db, 1)
+        self.assertEqual(len(res), 2)
+
+    def test_should_be_able_to_add_weapons_to_games(self):
+        create_3_games()
+        create_two_weapons()
+        games.add_weapon_to_game(db,1,1)
+        result = db.session.execute("SELECT * FROM weaponsingames;")
+        self.assertEqual(len(result.fetchall()), 1)
+
+    def test_should_be_able_to_get_weapons_in_game(self):
+        create_3_games()
+        create_two_weapons()
+        games.add_weapon_to_game(db, 1, 1)
+        games.add_weapon_to_game(db,2,1)
+        res = games.get_weapons_in_game(db,1)
+        self.assertEqual(len(res), 2)
+
+    def test_should_be_able_to_remove_weapon_from_game(self):
+        create_3_games()
+        create_two_weapons()
+        games.add_weapon_to_game(db, 1, 1)
+        games.add_weapon_to_game(db,2,1)
+        games.remove_weapon_from_game(db,1,1)
+        res = games.get_weapons_in_game(db,1)
+        self.assertEqual(len(res), 1)

@@ -20,7 +20,7 @@ def get_game(db, id):
     return result.fetchone()
 
 def get_players_for_game(db, game_id):
-    sql = "SELECT u.id, u.username FROM users u, playersingames p WHERE u.id = p.user_id AND p.game_id=:game_id"
+    sql = "SELECT u.* FROM users u, playersingames p WHERE u.id = p.user_id AND p.game_id=:game_id"
     result = db.session.execute(sql, {"game_id":game_id})
     return result.fetchall()
 
@@ -43,4 +43,24 @@ def add_player_to_game(db, user_id, game_id):
 def remove_player_from_game(db, user_id, game_id):
     sql = "DELETE FROM playersingames WHERE user_id=:user_id AND game_id=:game_id"
     db.session.execute(sql, {"user_id":user_id, "game_id":game_id})
+    db.session.commit()
+
+def get_weapons_available_for_game(db, game_id):
+    sql = "SELECT * FROM weapons w WHERE NOT EXISTS(SELECT * FROM weaponsingames g WHERE w.id = g.weapon_id AND g.game_id = :game_id)"
+    result = db.session.execute(sql, {"game_id":game_id})
+    return result.fetchall()
+
+def get_weapons_in_game(db, game_id):
+    sql = "SELECT w.* FROM weapons w, weaponsingames g WHERE w.id = g.weapon_id AND g.game_id = :game_id"
+    result = db.session.execute(sql, {"game_id":game_id})
+    return result.fetchall()
+
+def add_weapon_to_game(db, weapon_id, game_id):
+    sql = "INSERT INTO weaponsingames (weapon_id, game_id) VALUES (:weapon_id, :game_id)"
+    db.session.execute(sql, {"weapon_id":weapon_id, "game_id": game_id})
+    db.session.commit()
+
+def remove_weapon_from_game(db, weapon_id, game_id):
+    sql = "DELETE FROM weaponsingames WHERE weapon_id=:weapon_id AND game_id=:game_id"
+    db.session.execute(sql, {"weapon_id":weapon_id, "game_id":game_id})
     db.session.commit()

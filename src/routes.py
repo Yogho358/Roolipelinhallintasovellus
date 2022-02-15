@@ -22,6 +22,11 @@ def configure_routes(app, db):
         if session["csrf_token"] != request.form["csrf_token"]:
             abort(403)
 
+    def check_game_master(game_id):
+        game = game_repository.get_game(db, game_id)
+        if game.game_master_id != session["user_id"]:
+            abort(403)
+
     @app.route("/")
     def index():
         if not check_user():
@@ -156,14 +161,29 @@ def configure_routes(app, db):
     def manage_game(game_id):
         if not check_user():
             return redirect("/login")
-        
         game = game_repository.get_game(db, game_id)
         if game.game_master_id != session["user_id"]:
-            return redirect("/")
-
+            abort(403)
         players = game_repository.get_players_for_game(db,game_id)
+        weapons = game_repository.get_weapons_in_game(db, game_id)
+        available_weapons = game_repository.get_weapons_available_for_game(db, game_id)
 
-        return render_template("manage_game.html", game = game, players = players)
+        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons)
+
+    @app.route("/addweapontogame/<int:game_id>", methods = ["POST"])
+    def add_weapon_to_game(game_id):
+       check_csrf()
+       check_game_master(game_id)
+       game_repository.add_weapon_to_game(db,request.form["weapons"], game_id)
+       return redirect(f"/managegame/{game_id}")
+
+    @app.route("/removeweaponfromgame/<int:game_id>", methods =["POST"])
+    def remove_weapon_from_game(game_id):
+        check_csrf()
+        check_game_master(game_id)
+        weapon_id = request.form["weapon_id"]
+        game_repository.remove_weapon_from_game(db, weapon_id, game_id)
+        return redirect(f"/managegame/{game_id}")
 
     @app.route("/leavegame/<int:game_id>", methods = ["POST"])
     def leave_game(game_id):
