@@ -15,7 +15,7 @@
 
 <ul>
     {% for game in mastered_games %}
-<li>{{ game.name }}</a>
+<li><a href = "/managegame/{{ game.id }}">{{ game.name }}</a>
     {% endfor %}
 </ul>
 

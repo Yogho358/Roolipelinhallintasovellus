@@ -1,3 +1,14 @@
 <h1>{{ character.name }}</h1>
 
 <p>Kunto: {{ character.current_hp }} / {{ character.max_hp }}</p>
+<form action="/character/{{ character.id }}" method = "POST">
+    <p>Muokkaa kuntoa:<br>
+    <input type="radio" name = "modify_health" value = "increase" checked>
+    <label for="increase">Paranna</label>
+    <input type="radio" name = "modify_health" value = "decrease">
+    <label for="decrease">Haavoita</label>
+    <input type="number" name="health_value" placeholder="0">
+    <input type="submit" value="Muokkaa">
+    </p>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>

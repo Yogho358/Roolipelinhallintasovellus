@@ -1,0 +1,13 @@
+<h1>{{game.name}}</h1>
+
+<ul>
+    {% for user in players %}
+<li>{{ user.username }}</a>
+    {% endfor %}
+</ul>
+
+<ul>
+    {% for weapon in weapons %}
+<li>{{ weapon.name }}</a>
+    {% endfor %}
+</ul>

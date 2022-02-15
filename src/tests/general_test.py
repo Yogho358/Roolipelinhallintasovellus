@@ -2,6 +2,7 @@
 import unittest
 import character_repository
 import games
+import weapons
 from flask import Flask
 from db import get_db
 from users import register_user, login_user, get_user
@@ -29,12 +30,19 @@ def add_3_users_to_games():
     games.add_player_to_game(db, 3, 1)
     games.add_player_to_game(db, 1, 2)
 
+def create_character():
+    character_repository.create_character(db, 1, "test")
+
 def drop_tables():
+    db.session.execute("DROP TABLE IF EXISTS playersingames;")
+    db.session.execute("DROP TABLE IF EXISTS weaponsingames;")
     db.session.execute("DROP TABLE IF EXISTS test;")
     db.session.execute("DROP TABLE IF EXISTS users;")
     db.session.execute("DROP TABLE IF EXISTS characters;")
     db.session.execute("DROP TABLE IF EXISTS games;")
-    db.session.execute("DROP TABLE IF EXISTS playersingames;")
+    db.session.execute("DROP TABLE IF EXISTS weapons;")
+    
+    
 
 class TestStuff(unittest.TestCase):
     
@@ -44,10 +52,12 @@ class TestStuff(unittest.TestCase):
         
         drop_tables()
         db.session.execute("CREATE TABLE test (id SERIAL PRIMARY KEY, txt TEXT);")
-        db.session.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT, password TEXT);")
-        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT, current_hp INTEGER, max_hp INTEGER);")
-        db.session.execute("CREATE TABLE games (id SERIAL PRIMARY KEY, name TEXT, game_master_id INTEGER);")
-        db.session.execute("CREATE TABLE playersingames (user_id INTEGER, game_id INTEGER);")
+        db.session.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT NOT NULL, password TEXT NOT NULL);")
+        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL, current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER);")
+        db.session.execute("CREATE TABLE games (id SERIAL PRIMARY KEY, name TEXT NOT NULL, game_master_id INTEGER);")
+        db.session.execute("CREATE TABLE playersingames (user_id INTEGER REFERENCES users, game_id INTEGER REFERENCES games);")
+        db.session.execute("CREATE TABLE weapons (id SERIAL PRIMARY KEY, name TEXT NOT NULL, min_damage INTEGER, max_damage INTEGER, attack_modifier INTEGER, defence_modifier INTEGER, size TEXT, description TEXT);")
+        db.session.execute("CREATE TABLE weaponsingames (weapon_id INTEGER REFERENCES weapons, game_id INTEGER REFERENCES games);")
 
     def tearDown(self):
         drop_tables()
@@ -176,3 +186,29 @@ class TestStuff(unittest.TestCase):
         games.remove_player_from_game(db, 2, 1)
         players_in_game_1 = games.get_players_for_game(db, 1)
         self.assertEqual(len(players_in_game_1), 1)
+
+    def test_change_character_health_with_decrease(self):
+        create_character()
+        character_repository.change_character_health(db,1,5,20,20,False)
+        character = character_repository.get_character(db,1)
+        self.assertEqual(character.current_hp, 15)
+
+    def test_change_character_health_with_increase(self):
+        create_character()
+        character_repository.change_character_health(db,1,5,20,20,False)
+        character_repository.change_character_health(db,1,2,15,20,True)
+        character = character_repository.get_character(db,1)
+        self.assertEqual(character.current_hp, 17)
+
+    def test_change_health_should_not_increase_over_max(self):
+        create_character()
+        character_repository.change_character_health(db,1,5,20,20,False)
+        character_repository.change_character_health(db,1,200,15,20,True)
+        character = character_repository.get_character(db,1)
+        self.assertEqual(character.current_hp, 20)
+    
+    def test_can_create_weapon(self):
+        weapons.create_weapon(db, "longsword",1,5,50,50,"big", "a long sword")
+        result = db.session.execute("SELECT * FROM weapons;")
+        res = result.fetchall()
+        self.assertEqual(res[0].name, "longsword")

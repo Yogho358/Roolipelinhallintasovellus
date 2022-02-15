@@ -100,14 +100,27 @@ def configure_routes(app, db):
             character_repository.create_character(db, session["user_id"], name)
             return redirect("/characters")
 
-    @app.route("/character/<int:character_id>")
+    @app.route("/character/<int:character_id>", methods = ["GET", "POST"])
     def show_character(character_id):
         if not check_user():
             return redirect("/login")
         character = character_repository.get_character(db, character_id)
         if character.user_id != session["user_id"]:
             return redirect("/")
-        return render_template("character.html", character = character)
+        if request.method == "GET":
+            return render_template("character.html", character = character)
+
+        if request.method == "POST":
+            check_csrf()
+            if request.form["modify_health"] == "increase":
+                healing = True
+            else:
+                healing = False
+        
+            amount = int(request.form["health_value"])
+            character_repository.change_character_health(db, character.id, amount, character.current_hp, character.max_hp, healing)
+
+            return redirect(f"/character/{character.id}")
 
     @app.route("/newgame", methods = ["POST"])
     def new_game():
@@ -138,6 +151,19 @@ def configure_routes(app, db):
             except Exception as e:
                 print(e)
                 return redirect("/")
+
+    @app.route("/managegame/<int:game_id>")
+    def manage_game(game_id):
+        if not check_user():
+            return redirect("/login")
+        
+        game = game_repository.get_game(db, game_id)
+        if game.game_master_id != session["user_id"]:
+            return redirect("/")
+
+        players = game_repository.get_players_for_game(db,game_id)
+
+        return render_template("manage_game.html", game = game, players = players)
 
     @app.route("/leavegame/<int:game_id>", methods = ["POST"])
     def leave_game(game_id):
