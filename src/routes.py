@@ -12,13 +12,9 @@ def configure_routes(app, db):
     app.secret_key = getenv("SECRET_KEY")
 
     def check_user():
-        if session and session["username"]:
-            return True
-        else:
-            return False
-
+        return session and session["username"]
+            
     def check_csrf():
-        print(request.form["csrf_token"])
         if session["csrf_token"] != request.form["csrf_token"]:
             abort(403)
 
@@ -146,7 +142,10 @@ def configure_routes(app, db):
             game_master = users.get_user(db, game.game_master_id)
             players = game_repository.get_players_for_game(db, game_id)
             in_game = game_repository.check_if_in_game(db, session["user_id"], game_id)
-            return render_template("game_info.html", game = game, game_master = game_master, players = players, in_game = in_game)
+            characters_to_add = character_repository.get_users_characters(db, session["user_id"])
+            characters_in_game = game_repository.get_all_characters_in_game(db, game_id)
+
+            return render_template("game_info.html", game = game, game_master = game_master, players = players, in_game = in_game, characters_to_add = characters_to_add, characters_in_game = characters_in_game)
         
         if request.method == "POST":
             check_csrf()
@@ -177,6 +176,13 @@ def configure_routes(app, db):
        game_repository.add_weapon_to_game(db,request.form["weapons"], game_id)
        return redirect(f"/managegame/{game_id}")
 
+    @app.route("/addcharactertogame/<int:game_id>", methods = ["POST"])
+    def add_character_to_game(game_id):
+        check_csrf()
+        character_repository.add_character_to_game(db, request.form["characters_to_add"], game_id)
+        return redirect(f"/gameinfo/{game_id}")
+
+
     @app.route("/removeweaponfromgame/<int:game_id>", methods =["POST"])
     def remove_weapon_from_game(game_id):
         check_csrf()
@@ -191,6 +197,14 @@ def configure_routes(app, db):
             return redirect("/login")
         check_csrf()
         game_repository.remove_player_from_game(db, session["user_id"], game_id)
+        game_repository.remove_all_characters_from_game(db, session["user_id"], game_id)
+        return redirect(f"/gameinfo/{game_id}")
+
+    @app.route("/removecharacterfromgame/<int:game_id>", methods = ["POST"])
+    def remove_character_from_game(game_id):
+        check_csrf()
+        character_id = request.form["character_id"]
+        character_repository.remove_character_from_game(db, character_id)
         return redirect(f"/gameinfo/{game_id}")
 
     

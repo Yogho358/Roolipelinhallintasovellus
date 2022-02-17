@@ -37,11 +37,20 @@ def create_two_weapons():
     weapons.create_weapon(db, "pitkämiekka", 2, 6, 50, 50, "big", "miekka,joka on pitkä")
     weapons.create_weapon(db, 'perhosmiekat', 2, 6, 50, 50, 'big', 'yksi per käsi')
 
+def create_three_games_and_add_characters():
+    character_repository.create_character(db, 1, "test")
+    character_repository.create_character(db, 2, "test2")
+    character_repository.create_character(db, 3, "test3")
+    character_repository.add_character_to_game(db,1,2)
+    character_repository.add_character_to_game(db,2,2)
+    character_repository.add_character_to_game(db,3,3)
+
 def drop_tables():
     db.session.execute("DROP TABLE IF EXISTS playersingames;")
     db.session.execute("DROP TABLE IF EXISTS weaponsingames;")
     db.session.execute("DROP TABLE IF EXISTS test;")
     db.session.execute("DROP TABLE IF EXISTS users;")
+    
     db.session.execute("DROP TABLE IF EXISTS characters;")
     db.session.execute("DROP TABLE IF EXISTS games;")
     db.session.execute("DROP TABLE IF EXISTS weapons;")
@@ -56,9 +65,9 @@ class TestStuff(unittest.TestCase):
         
         drop_tables()
         db.session.execute("CREATE TABLE test (id SERIAL PRIMARY KEY, txt TEXT);")
-        db.session.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT NOT NULL, password TEXT NOT NULL);")
-        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL, current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER);")
         db.session.execute("CREATE TABLE games (id SERIAL PRIMARY KEY, name TEXT NOT NULL, game_master_id INTEGER);")
+        db.session.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT NOT NULL, password TEXT NOT NULL);")
+        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL, current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games);")
         db.session.execute("CREATE TABLE playersingames (user_id INTEGER REFERENCES users, game_id INTEGER REFERENCES games);")
         db.session.execute("CREATE TABLE weapons (id SERIAL PRIMARY KEY, name TEXT NOT NULL, min_damage INTEGER, max_damage INTEGER, attack_modifier INTEGER, defence_modifier INTEGER, size TEXT, description TEXT);")
         db.session.execute("CREATE TABLE weaponsingames (weapon_id INTEGER REFERENCES weapons, game_id INTEGER REFERENCES games);")
@@ -244,4 +253,37 @@ class TestStuff(unittest.TestCase):
         games.add_weapon_to_game(db,2,1)
         games.remove_weapon_from_game(db,1,1)
         res = games.get_weapons_in_game(db,1)
+        self.assertEqual(len(res), 1)
+
+    def test_should_be_able_to_add_character_to_game(self):
+        register_testman()
+        create_character()
+        create_3_games()
+        character_repository.add_character_to_game(db, 1, 2)
+        res = db.session.execute("SELECT * FROM characters WHERE game_id = 2")
+        self.assertEqual(len(res.fetchall()), 1)
+
+    def test_should_get_all_characters_in_game_by_id(self):
+        register_3_users()
+        create_3_games()
+        create_three_games_and_add_characters()
+        res = games.get_all_characters_in_game(db, 2)
+        self.assertEqual(len(res), 2)
+
+    def test_should_be_able_to_remove_character_from_game_by_character_id(self):
+        register_3_users()
+        create_3_games()
+        create_three_games_and_add_characters()
+        character_repository.remove_character_from_game(db, 2)
+        res = games.get_all_characters_in_game(db, 2)
+        self.assertEqual(len(res), 1)
+
+    def test_should_be_able_to_remove_all_characters_of_a_user_from_a_game(self):
+        register_3_users()
+        create_3_games()
+        create_three_games_and_add_characters()
+        character_repository.create_character(db, 1, "test4")
+        character_repository.add_character_to_game(db, 4, 2)
+        games.remove_all_characters_from_game(db, 1, 2)
+        res = games.get_all_characters_in_game(db, 2)
         self.assertEqual(len(res), 1)

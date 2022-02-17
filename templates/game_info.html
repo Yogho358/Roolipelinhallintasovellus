@@ -4,12 +4,44 @@
     <p>Pelaajat:</p>
     <ul>
         {% for player in players %}
-    <li>{{player.username}}</a>
+        
+    <li>{{player.username}} hahmoilla  <form action="/removecharacterfromgame/{{game.id}}" method = "POST">
+                                        <ul>
+                                        {% for character in characters_in_game %}
+                                        {% if character.user_id == player.id %}
+                                        <li>{{character.name}} <button type="submit" name="character_id" value="{{ character.id }}">Poista</button></li>
+                                        {% else %}
+                                        <li>{{character.name}}</li>
+                                        {% endif %}
+                                        {% endfor %}              
+                                        </ul> </a>
+                                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                                    </form>
         {% endfor %}
     </ul>
 {% endif %}
 
+
 {% if in_game %}
+
+<p>Liitä hahmo peliin:</p>
+
+{% if characters_to_add %}
+
+<form action = "/addcharactertogame/{{game.id}}" method = "POST">
+    <select name=characters_to_add>
+        {% for character in characters_to_add %}
+            <option value="{{ character.id }}">{{ character.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Lisää">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+
+{% else %}
+<p>Ei hahmoja</p>
+
+{% endif %}
 
 <form action ="/leavegame/{{ game.id }}" method = "POST">
     <input type = "submit" value = "Poistu pelistä">

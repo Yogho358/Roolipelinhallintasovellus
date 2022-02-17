@@ -25,3 +25,15 @@ def change_character_health(db, id, amount, current, max, healing):
     sql = "UPDATE characters SET current_hp=current_hp+:amount WHERE id=:id"
     db.session.execute(sql, {"amount": amount, "id":id})
     db.session.commit()
+
+def add_character_to_game(db, character_id, game_id):
+    sql = "UPDATE characters SET game_id=:game_id WHERE id=:character_id"
+    db.session.execute(sql, {"game_id":game_id, "character_id":character_id})
+    db.session.commit()
+
+def remove_character_from_game(db, character_id):
+    sql = "UPDATE characters SET game_id=NULL WHERE id=:character_id"
+    db.session.execute(sql, {"character_id":character_id})
+    db.session.commit()
+
+
