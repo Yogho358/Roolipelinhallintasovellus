@@ -1,3 +1,7 @@
+{% extends "layout.html" %}
+{% block title %}Etusivu{% endblock %}
+{% block content %}
+
 <title>Roolipelisovellus</title>
 <h1>Tervetuloa, {{ session.username }}</h1>
 <a href = "/characters">Pelihahmot</a>
@@ -33,4 +37,4 @@
 
 {% endif %}
 
-<a href = "/logout">Kirjaudu ulos</a>
+{% endblock %}

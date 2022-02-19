@@ -3,6 +3,7 @@ from flask import redirect, render_template, request, session, abort
 import src.users as users
 import src.character_repository as character_repository
 import src.games as game_repository
+import src.weapons as weapon_repository
 from os import getenv, urandom
 
 
@@ -166,8 +167,9 @@ def configure_routes(app, db):
         players = game_repository.get_players_for_game(db,game_id)
         weapons = game_repository.get_weapons_in_game(db, game_id)
         available_weapons = game_repository.get_weapons_available_for_game(db, game_id)
+        sizes = [(0,"pieni"),(1,"iso")]
 
-        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons)
+        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes)
 
     @app.route("/addweapontogame/<int:game_id>", methods = ["POST"])
     def add_weapon_to_game(game_id):
@@ -207,4 +209,20 @@ def configure_routes(app, db):
         character_repository.remove_character_from_game(db, character_id)
         return redirect(f"/gameinfo/{game_id}")
 
+    @app.route("/createweapon/<int:game_id>", methods = ["POST"])
+    def create_weapon(game_id):
+        check_csrf()
+        name = request.form["weapon_name"]
+        min_damage = request.form["min_damage"]
+        max_damage = request.form["max_damage"]
+        attack_modifier = request.form["attack_modifier"]
+        defence_modifier = request.form["defence_modifier"]
+        size = request.form["size"]      
+        if size == "0":
+            size = "small"
+        if size == "1":
+            size = "big"
+        desciption = request.form["description"]
+        weapon_repository.create_weapon(db, name, min_damage, max_damage, attack_modifier, defence_modifier, size, desciption)
+        return redirect(f"/managegame/{game_id}")
     

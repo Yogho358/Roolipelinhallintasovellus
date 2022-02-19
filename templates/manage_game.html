@@ -1,3 +1,7 @@
+{% extends "layout.html" %}
+{% block title %}Johdettu peli{% endblock %}
+{% block content %}
+
 <h1>{{game.name}}</h1>
 
 <h3>Pelaajat pelissä:</h3>
@@ -38,3 +42,23 @@
 <p>Ei lisättäviä aseita</p>
 
 {% endif %}
+
+<h3>Luo uusi ase</h3>
+
+<form action ="/createweapon/{{game.id}}" method = "POST">
+    <p>Nimi: <input type="text" name="weapon_name"> </p>
+    <p>Minimivahinko: <input type="number" name="min_damage" placeholder="0"></p>
+    <p>Maksimivahinko: <input type="number" name="max_damage" placeholder="0"></p>
+    <p>Hyökkäystehokkuus: <input type="number" name="attack_modifier" placeholder="0"></p>
+    <p>Puolustustehokkuus: <input type="number" name="defence_modifier" placeholder="0"></p>
+    <p>Koko: <select name="size">
+        {% for size in sizes %}
+            <option value = "{{size[0]}}">{{size[1]}}</option>
+        {% endfor %}
+    </select></p>
+    <p>Kuvaus: <textarea name="description" rows="3", cols="50"></textarea></p>
+    <input type="submit" value="Luo">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+
+{% endblock %}

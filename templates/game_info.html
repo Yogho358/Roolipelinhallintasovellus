@@ -1,3 +1,7 @@
+{% extends "layout.html" %}
+{% block title %}Peli{% endblock %}
+{% block content %}
+
 <h1>{{ game.name }}</h1>
 <p>Pelinjohtaja: {{ game_master.username }}</p>
 {% if players %}
@@ -9,9 +13,7 @@
                                         <ul>
                                         {% for character in characters_in_game %}
                                         {% if character.user_id == player.id %}
-                                        <li>{{character.name}} <button type="submit" name="character_id" value="{{ character.id }}">Poista</button></li>
-                                        {% else %}
-                                        <li>{{character.name}}</li>
+                                        {% if session.user_id == character.user_id %}<li><a href="/character/{{ character.id }}">{{character.name}}</a>  <button type="submit" name="character_id" value="{{ character.id }}">Poista</button> </li>{% else %}<li>{{character.name}}</li>{% endif %}                        
                                         {% endif %}
                                         {% endfor %}              
                                         </ul> </a>
@@ -56,3 +58,5 @@
 </form>
 
 {% endif %}
+
+{% endblock %}

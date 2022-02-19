@@ -4,7 +4,7 @@ def create_game(db, name, game_master_id):
     db.session.commit()
 
 def get_mastered_games(db, id):
-    sql = "SELECT * FROM games WHERE game_master_id=:id"
+    sql = "SELECT * FROM games WHERE game_master_id=:id ORDER BY name"
     result = db.session.execute(sql, {"id":id})
     games = result.fetchall()
     return games
@@ -66,7 +66,7 @@ def remove_weapon_from_game(db, weapon_id, game_id):
     db.session.commit()
 
 def get_all_characters_in_game(db, game_id):
-    sql = "SELECT * FROM characters WHERE game_id=:game_id"
+    sql = "SELECT * FROM characters WHERE game_id=:game_id ORDER BY name"
     result = db.session.execute(sql, {"game_id":game_id})
     return result.fetchall()
 
