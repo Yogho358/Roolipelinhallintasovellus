@@ -115,7 +115,9 @@ def configure_routes(app, db):
         if request.method == "GET":
             game = game_repository.get_game(db, character.game_id)
             weapon = weapon_repository.get_weapon(db, character.weapon_id)
-            available_weapons = game_repository.get_weapons_in_game(db, game.id)
+            available_weapons = None
+            if game:
+                available_weapons = game_repository.get_weapons_in_game(db, game.id)
             return render_template("character.html", character = character, game = game, weapon = weapon, available_weapons = available_weapons)
 
         if request.method == "POST":
@@ -132,6 +134,8 @@ def configure_routes(app, db):
 
     @app.route("/changecharacterweapon/<int:character_id>", methods =["POST"])
     def change_character_weapon(character_id):
+        if not check_user():
+            return redirect("/login")
         check_csrf()
         character_repository.set_weapon(db,character_id, request.form["weapons"])
         return redirect(f"/character/{character_id}")
@@ -185,13 +189,17 @@ def configure_routes(app, db):
 
     @app.route("/addweapontogame/<int:game_id>", methods = ["POST"])
     def add_weapon_to_game(game_id):
-       check_csrf()
-       check_game_master(game_id)
-       game_repository.add_weapon_to_game(db,request.form["weapons"], game_id)
-       return redirect(f"/managegame/{game_id}")
+        if not check_user():
+            return redirect("/login")
+        check_csrf()
+        check_game_master(game_id)
+        game_repository.add_weapon_to_game(db,request.form["weapons"], game_id)
+        return redirect(f"/managegame/{game_id}")
 
     @app.route("/addcharactertogame/<int:game_id>", methods = ["POST"])
     def add_character_to_game(game_id):
+        if not check_user():
+            return redirect("/login")
         check_csrf()
         character_repository.add_character_to_game(db, request.form["characters_to_add"], game_id)
         return redirect(f"/gameinfo/{game_id}")
@@ -199,6 +207,8 @@ def configure_routes(app, db):
 
     @app.route("/removeweaponfromgame/<int:game_id>", methods =["POST"])
     def remove_weapon_from_game(game_id):
+        if not check_user():
+            return redirect("/login")
         check_csrf()
         check_game_master(game_id)
         weapon_id = request.form["weapon_id"]
@@ -216,6 +226,8 @@ def configure_routes(app, db):
 
     @app.route("/removecharacterfromgame/<int:game_id>", methods = ["POST"])
     def remove_character_from_game(game_id):
+        if not check_user():
+            return redirect("/login")
         check_csrf()
         character_id = request.form["character_id"]
         character_repository.remove_character_from_game(db, character_id)
@@ -223,6 +235,8 @@ def configure_routes(app, db):
 
     @app.route("/createweapon/<int:game_id>", methods = ["POST"])
     def create_weapon(game_id):
+        if not check_user():
+            return redirect("/login")
         check_csrf()
         name = request.form["weapon_name"]
         min_damage = request.form["min_damage"]
