@@ -4,6 +4,12 @@
 
 <h1>{{ character.name }}</h1>
 
+{% if game %}
+<p>Pelissä: {{ game.name }}</p>
+{% else %}
+<p> Ei ole liittynynt peliin</p>
+{% endif %}
+
 <p>Kunto: {{ character.current_hp }} / {{ character.max_hp }}</p>
 <form action="/character/{{ character.id }}" method = "POST">
     <p>Muokkaa kuntoa:<br>
@@ -17,4 +23,20 @@
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 
+<p>Ase: <br>
+    {{ weapon.name }}, kuvaus: {{ weapon.description }}
+</p>
+
+<h3>Vaihda asetta:</h3>
+<form action = "/changecharacterweapon/{{character.id}}", method = "POST">
+    <select name="weapons">
+        {% for w in available_weapons %}
+            <option value="{{ w.id }}">{{ w.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Vaihda">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+
 {% endblock %}
+

@@ -33,9 +33,11 @@ def add_3_users_to_games():
 def create_character():
     character_repository.create_character(db, 1, "test")
 
-def create_two_weapons():
+def create_weapons():
+    weapons.create_weapon(db, 'nyrkki', 1, 2, 30, 30, 'small', 'Käsi puristettuna palloon')
     weapons.create_weapon(db, "pitkämiekka", 2, 6, 50, 50, "big", "miekka,joka on pitkä")
     weapons.create_weapon(db, 'perhosmiekat', 2, 6, 50, 50, 'big', 'yksi per käsi')
+    
 
 def create_three_games_and_add_characters():
     character_repository.create_character(db, 1, "test")
@@ -67,10 +69,12 @@ class TestStuff(unittest.TestCase):
         db.session.execute("CREATE TABLE test (id SERIAL PRIMARY KEY, txt TEXT);")
         db.session.execute("CREATE TABLE games (id SERIAL PRIMARY KEY, name TEXT NOT NULL, game_master_id INTEGER);")
         db.session.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT NOT NULL, password TEXT NOT NULL);")
-        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL, current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games);")
+        
         db.session.execute("CREATE TABLE playersingames (user_id INTEGER REFERENCES users, game_id INTEGER REFERENCES games);")
         db.session.execute("CREATE TABLE weapons (id SERIAL PRIMARY KEY, name TEXT NOT NULL, min_damage INTEGER, max_damage INTEGER, attack_modifier INTEGER, defence_modifier INTEGER, size TEXT, description TEXT);")
         db.session.execute("CREATE TABLE weaponsingames (weapon_id INTEGER REFERENCES weapons, game_id INTEGER REFERENCES games);")
+        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL, current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games, weapon_id INTEGER REFERENCES weapons);")
+        create_weapons()
 
     def tearDown(self):
         drop_tables()
@@ -224,23 +228,22 @@ class TestStuff(unittest.TestCase):
         weapons.create_weapon(db, "longsword",1,5,50,50,"big", "a long sword")
         result = db.session.execute("SELECT * FROM weapons;")
         res = result.fetchall()
-        self.assertEqual(res[0].name, "longsword")
+        self.assertEqual(res[3].name, "longsword")
 
     def test_get_available_weapons_for_games_should_return_all_weapons_with_empty_input(self):
-        create_two_weapons()
         res = games.get_weapons_available_for_game(db, 1)
-        self.assertEqual(len(res), 2)
+        self.assertEqual(len(res), 3)
 
     def test_should_be_able_to_add_weapons_to_games(self):
         create_3_games()
-        create_two_weapons()
+        
         games.add_weapon_to_game(db,1,1)
         result = db.session.execute("SELECT * FROM weaponsingames;")
         self.assertEqual(len(result.fetchall()), 1)
 
     def test_should_be_able_to_get_weapons_in_game(self):
         create_3_games()
-        create_two_weapons()
+        
         games.add_weapon_to_game(db, 1, 1)
         games.add_weapon_to_game(db,2,1)
         res = games.get_weapons_in_game(db,1)
@@ -248,7 +251,7 @@ class TestStuff(unittest.TestCase):
 
     def test_should_be_able_to_remove_weapon_from_game(self):
         create_3_games()
-        create_two_weapons()
+        
         games.add_weapon_to_game(db, 1, 1)
         games.add_weapon_to_game(db,2,1)
         games.remove_weapon_from_game(db,1,1)
@@ -287,3 +290,21 @@ class TestStuff(unittest.TestCase):
         games.remove_all_characters_from_game(db, 1, 2)
         res = games.get_all_characters_in_game(db, 2)
         self.assertEqual(len(res), 1)
+
+    def test_create_character_should_add_nyrkki_as_weapon(self):
+        register_testman()
+        character_repository.create_character(db, 1, "test")
+        character = character_repository.get_character(db, 1)
+        weapon = weapons.get_weapon(db, character.weapon_id)
+        self.assertEqual(weapon.name, "nyrkki")
+
+    def test_find_default_weapon_should_find_nyrkki(self):
+        weapon_id = weapons.get_default_weapon_id(db)
+        self.assertEqual(weapon_id, 1)
+
+    def test_set_weapon_should_set_weapon(self):
+        create_character()
+        character_repository.set_weapon(db, 1, 2)
+        character = character_repository.get_character(db, 1)
+        weapon = weapons.get_weapon(db, character.weapon_id)
+        self.assertEqual(weapon.name, "pitkämiekka")

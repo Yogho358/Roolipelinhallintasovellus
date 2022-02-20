@@ -99,7 +99,8 @@ def configure_routes(app, db):
         if request.method == "POST":
             check_csrf()
             name = request.form["character_name"]
-            character_repository.create_character(db, session["user_id"], name)
+            default_weapon_id = weapon_repository.get_default_weapon_id(db)
+            character_repository.create_character(db, session["user_id"], name, 20, default_weapon_id)
             return redirect("/characters")
 
     @app.route("/character/<int:character_id>", methods = ["GET", "POST"])
@@ -109,8 +110,13 @@ def configure_routes(app, db):
         character = character_repository.get_character(db, character_id)
         if character.user_id != session["user_id"]:
             return redirect("/")
+
+
         if request.method == "GET":
-            return render_template("character.html", character = character)
+            game = game_repository.get_game(db, character.game_id)
+            weapon = weapon_repository.get_weapon(db, character.weapon_id)
+            available_weapons = game_repository.get_weapons_in_game(db, game.id)
+            return render_template("character.html", character = character, game = game, weapon = weapon, available_weapons = available_weapons)
 
         if request.method == "POST":
             check_csrf()
@@ -123,6 +129,12 @@ def configure_routes(app, db):
             character_repository.change_character_health(db, character.id, amount, character.current_hp, character.max_hp, healing)
 
             return redirect(f"/character/{character.id}")
+
+    @app.route("/changecharacterweapon/<int:character_id>", methods =["POST"])
+    def change_character_weapon(character_id):
+        check_csrf()
+        character_repository.set_weapon(db,character_id, request.form["weapons"])
+        return redirect(f"/character/{character_id}")
 
     @app.route("/newgame", methods = ["POST"])
     def new_game():
