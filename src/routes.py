@@ -10,6 +10,8 @@ from os import getenv, urandom
 
 def configure_routes(app, db):
 
+    error = None
+
     app.secret_key = getenv("SECRET_KEY")
 
     def check_user():
@@ -59,8 +61,9 @@ def configure_routes(app, db):
 
     @app.route("/register", methods = ["GET", "POST"])
     def register():
+        
         if request.method == "GET":
-            return render_template("register.html")
+            return render_template("register.html", error = error)
 
         if request.method == "POST":
             try:
@@ -70,8 +73,8 @@ def configure_routes(app, db):
                 users.register_user(db, username, password1, password2)
                 return redirect("/")
             except Exception as e:
-                print(e)
-                return redirect("/")
+                error = e
+                return redirect("/register")
 
     @app.route("/logout")
     def logout():
@@ -161,8 +164,9 @@ def configure_routes(app, db):
             in_game = game_repository.check_if_in_game(db, session["user_id"], game_id)
             characters_to_add = character_repository.get_users_characters(db, session["user_id"])
             characters_in_game = game_repository.get_all_characters_in_game(db, game_id)
+            player_count = game_repository.get_number_of_players_in_game(db, game_id)
 
-            return render_template("game_info.html", game = game, game_master = game_master, players = players, in_game = in_game, characters_to_add = characters_to_add, characters_in_game = characters_in_game)
+            return render_template("game_info.html", game = game, game_master = game_master, players = players, in_game = in_game, characters_to_add = characters_to_add, characters_in_game = characters_in_game, player_count = player_count)
         
         if request.method == "POST":
             check_csrf()

@@ -5,6 +5,7 @@
 <h1>{{ game.name }}</h1>
 <p>Pelinjohtaja: {{ game_master.username }}</p>
 {% if players %}
+    <p>{{ player_count }} pelaajaa</p>
     <p>Pelaajat:</p>
     <ul>
         {% for player in players %}

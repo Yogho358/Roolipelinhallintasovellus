@@ -11,5 +11,6 @@ def get_weapon(db, id):
 def get_default_weapon_id(db):
     sql = "SELECT id FROM weapons WHERE name='Nyrkki'"
     result = db.session.execute(sql)
-    weapon_id = result.fetchone()[0]
+    res = result.fetchone()
+    weapon_id = res[0]
     return weapon_id

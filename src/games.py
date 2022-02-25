@@ -74,3 +74,9 @@ def remove_all_characters_from_game(db, user_id, game_id):
     sql = "UPDATE characters SET game_id = NULL where user_id=:user_id AND game_id=:game_id"
     db.session.execute(sql, {"user_id":user_id, "game_id":game_id})
     db.session.commit()
+
+def get_number_of_players_in_game(db, game_id):
+    sql = "SELECT COUNT(u.*) FROM users u, playersingames p WHERE u.id = p.user_id AND p.game_id=:game_id"
+    result = db.session.execute(sql, {"game_id":game_id})
+    count = result.fetchone()[0]
+    return count

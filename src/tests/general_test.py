@@ -29,12 +29,12 @@ def add_3_users_to_games():
     games.add_player_to_game(db, 2, 1)
     games.add_player_to_game(db, 3, 1)
     games.add_player_to_game(db, 1, 2)
-
+    
 def create_character():
     character_repository.create_character(db, 1, "test")
 
 def create_weapons():
-    weapons.create_weapon(db, 'nyrkki', 1, 2, 30, 30, 'small', 'Käsi puristettuna palloon')
+    weapons.create_weapon(db, 'Nyrkki', 1, 2, 30, 30, 'small', 'Käsi puristettuna palloon')
     weapons.create_weapon(db, "pitkämiekka", 2, 6, 50, 50, "big", "miekka,joka on pitkä")
     weapons.create_weapon(db, 'perhosmiekat', 2, 6, 50, 50, 'big', 'yksi per käsi')
     
@@ -296,7 +296,7 @@ class TestStuff(unittest.TestCase):
         character_repository.create_character(db, 1, "test")
         character = character_repository.get_character(db, 1)
         weapon = weapons.get_weapon(db, character.weapon_id)
-        self.assertEqual(weapon.name, "nyrkki")
+        self.assertEqual(weapon.name, "Nyrkki")
 
     def test_find_default_weapon_should_find_nyrkki(self):
         weapon_id = weapons.get_default_weapon_id(db)
@@ -308,3 +308,10 @@ class TestStuff(unittest.TestCase):
         character = character_repository.get_character(db, 1)
         weapon = weapons.get_weapon(db, character.weapon_id)
         self.assertEqual(weapon.name, "pitkämiekka")
+
+    def test_should_find_number_of_players_in_game(self):
+        register_3_users()
+        create_3_games()
+        add_3_users_to_games()
+        res = games.get_number_of_players_in_game(db, 1)
+        self.assertEqual(res, 2)
