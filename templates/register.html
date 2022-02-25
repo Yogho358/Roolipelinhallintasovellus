@@ -1,6 +1,6 @@
-{% if error %}
-<h1>{{ error }}</h1>
-{% endif %}
+{% extends "layout.html" %}
+{% block title %}Johdettu peli{% endblock %}
+{% block content %}
 
 <form action="/register" method="POST">
     <p>Käyttäjänimi:<br>
@@ -11,3 +11,5 @@
     <input type="password" name="password2"></p>
     <input type="submit" value="Rekisteröidy">
 </form>
+
+{% endblock %}

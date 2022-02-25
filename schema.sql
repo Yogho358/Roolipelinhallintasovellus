@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS weapons;
 
 CREATE TABLE test (id SERIAL PRIMARY KEY, txt TEXT);
 
-CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
+CREATE TABLE users (id SERIAL PRIMARY KEY, username TEXT UNIQUE NOT NULL CHECK (username != ''), password TEXT NOT NULL CHECK (password != ''));
 
 CREATE TABLE games (id SERIAL PRIMARY KEY, name TEXT NOT NULL, game_master_id INTEGER);
 
@@ -26,7 +26,7 @@ CREATE TABLE weapons (id SERIAL PRIMARY KEY, name TEXT NOT NULL, min_damage INTE
 
 CREATE TABLE weaponsingames (weapon_id INTEGER REFERENCES weapons, game_id INTEGER REFERENCES games);
 
-CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL, current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games, weapon_id INTEGER REFERENCES weapons);
+CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL CHECK (name != ''), current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games, weapon_id INTEGER REFERENCES weapons);
 
 INSERT INTO weapons (name, min_damage, max_damage, attack_modifier, defence_modifier, size, description) VALUES ('Pitkämiekka', 2, 6, 50, 50, 'big', 'miekka, joka on pitkä');
 

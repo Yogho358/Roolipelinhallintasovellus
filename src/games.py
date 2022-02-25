@@ -1,4 +1,6 @@
 def create_game(db, name, game_master_id):
+    if len(name) == 0:
+        raise Exception("Täytyy antaa nimi")
     sql = "INSERT INTO games (name, game_master_id) VALUES (:name, :game_master_id)"
     db.session.execute(sql, {"name":name, "game_master_id":game_master_id})
     db.session.commit()

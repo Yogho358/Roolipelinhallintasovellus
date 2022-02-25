@@ -1,7 +1,35 @@
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<style>
+    body  {
+        background: Azure;
+        margin: auto;
+        max-width: 45em;
+        font-family: 'Helvetica', 'Arial', sans-serif;
+        
+    }.error {
+        color: #D8000C;
+		background-color: #FFBABA;
+    }
+
+
+    
+</style>
+</head>
+
 <title>Roolipelinhallintasovellus - {% block title %}{% endblock %}</title>
+
 <a href="/">Etusivu</a>
 <a href="/characters">Omat hahmot</a>
 <a href="/logout">Kirjaudu ulos</a>
+
+{% if error %}
+    <div class="error">{{ error }}</div>
+{% endif %}
 <hr>
+
 {% block content %}{% endblock %}
+
 <hr>

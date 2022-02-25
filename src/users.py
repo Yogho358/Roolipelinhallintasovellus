@@ -6,11 +6,20 @@ def register_user(db, username, password1, password2):
     if password1 != password2:
         raise Exception("Salasanat eivät ole samoja")
 
-    hash_value = generate_password_hash(password1)   
-    sql = "INSERT INTO users (username, password) VALUES (:username, :password)"
+    if len(username) == 0:
+        raise Exception("Täytyy antaa käyttäjätunnus")
+
+    if len(password1) == 0:
+        raise Exception("Täytyy antaa salasana")
+
+    hash_value = generate_password_hash(password1)
+    try:
+        sql = "INSERT INTO users (username, password) VALUES (:username, :password)"
     
-    db.session.execute(sql, {"username": username,  "password": hash_value})
-    db.session.commit()
+        db.session.execute(sql, {"username": username,  "password": hash_value})
+        db.session.commit()
+    except Exception as e:
+        raise Exception("Käyttäjänimi on jo olemassa")
 
 def login_user(db, username, password):
     sql = "SELECT * FROM users WHERE username=:username"

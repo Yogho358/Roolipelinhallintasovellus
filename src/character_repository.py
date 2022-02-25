@@ -1,6 +1,8 @@
 
 
 def create_character(db, user_id, name, hp = 20, weapon_id = 1):
+    if len(name) == 0:
+        raise Exception("Täytyy antaa nimi")
     sql = "INSERT INTO characters (user_id, name, current_hp, max_hp, attack_skill, defence_skill, weapon_id) VALUES (:user_id, :name, :current_hp, :max_hp, :attack_skill, :defence_skill, :weapon_id)"
     db.session.execute(sql, {"name": name, "user_id": user_id, "current_hp": hp, "max_hp": hp, "attack_skill":50, "defence_skill":50, "weapon_id": weapon_id})
     db.session.commit()

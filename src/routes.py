@@ -1,18 +1,20 @@
 
+from tkinter import E
 from flask import redirect, render_template, request, session, abort
 import src.users as users
 import src.character_repository as character_repository
 import src.games as game_repository
 import src.weapons as weapon_repository
 from os import getenv, urandom
+from src.error import Error
 
 
 
 def configure_routes(app, db):
 
-    error = None
-
     app.secret_key = getenv("SECRET_KEY")
+
+    err = Error()
 
     def check_user():
         return session and session["username"]
@@ -30,17 +32,22 @@ def configure_routes(app, db):
     def index():
         if not check_user():
             return redirect("/login")
+
+        error = err.error
+        err.error = None
         
         mastered_games = game_repository.get_mastered_games(db, session["user_id"])
         all_games = game_repository.get_all_games(db)
         
-        return render_template("frontpage.html", mastered_games = mastered_games, all_games = all_games)
+        return render_template("frontpage.html", mastered_games = mastered_games, all_games = all_games, error = error)
         
         
     @app.route("/login", methods = ["GET", "POST"])
     def login():
         if request.method == "GET":
-            return render_template("login.html")
+            error = err.error
+            err.error = None
+            return render_template("login.html", error = error)
 
         if request.method == "POST":
             username = request.form["username"]
@@ -53,7 +60,7 @@ def configure_routes(app, db):
                session["csrf_token"] = urandom(16).hex()
                return redirect("/")
             except Exception as e:
-                print(e)
+                err.error = e
                 return redirect("/")
             
         
@@ -63,6 +70,8 @@ def configure_routes(app, db):
     def register():
         
         if request.method == "GET":
+            error = err.error
+            err.error = None
             return render_template("register.html", error = error)
 
         if request.method == "POST":
@@ -73,7 +82,7 @@ def configure_routes(app, db):
                 users.register_user(db, username, password1, password2)
                 return redirect("/")
             except Exception as e:
-                error = e
+                err.error = e
                 return redirect("/register")
 
     @app.route("/logout")
@@ -97,14 +106,20 @@ def configure_routes(app, db):
             return redirect("/login")
 
         if request.method == "GET":
-            return render_template("newcharacter.html")
+            error = err.error
+            err.error = None
+            return render_template("newcharacter.html", error = error)
 
         if request.method == "POST":
             check_csrf()
             name = request.form["character_name"]
             default_weapon_id = weapon_repository.get_default_weapon_id(db)
-            character_repository.create_character(db, session["user_id"], name, 20, default_weapon_id)
-            return redirect("/characters")
+            try:
+                character_repository.create_character(db, session["user_id"], name, 20, default_weapon_id)
+                return redirect("/characters")
+            except Exception as e:
+                err.error = e
+                return redirect("/newcharacter")
 
     @app.route("/character/<int:character_id>", methods = ["GET", "POST"])
     def show_character(character_id):
@@ -149,8 +164,12 @@ def configure_routes(app, db):
             return redirect("/login")
         check_csrf()
         name = request.form["new_game_name"]
-        game_repository.create_game(db, name, session["user_id"])
-        return redirect("/")
+        try:
+            game_repository.create_game(db, name, session["user_id"])
+            return redirect("/")
+        except Exception as e:
+            err.error = e
+            return redirect("/")
 
     @app.route("/gameinfo/<int:game_id>", methods = ["GET", "POST"])
     def game_info(game_id):
@@ -181,6 +200,8 @@ def configure_routes(app, db):
     def manage_game(game_id):
         if not check_user():
             return redirect("/login")
+        error = err.error
+        err.error = None
         game = game_repository.get_game(db, game_id)
         if game.game_master_id != session["user_id"]:
             abort(403)
@@ -189,7 +210,7 @@ def configure_routes(app, db):
         available_weapons = game_repository.get_weapons_available_for_game(db, game_id)
         sizes = [(0,"pieni"),(1,"iso")]
 
-        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes)
+        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes, error = error)
 
     @app.route("/addweapontogame/<int:game_id>", methods = ["POST"])
     def add_weapon_to_game(game_id):
@@ -197,8 +218,12 @@ def configure_routes(app, db):
             return redirect("/login")
         check_csrf()
         check_game_master(game_id)
-        game_repository.add_weapon_to_game(db,request.form["weapons"], game_id)
-        return redirect(f"/managegame/{game_id}")
+        try:
+            game_repository.add_weapon_to_game(db,request.form["weapons"], game_id)
+            return redirect(f"/managegame/{game_id}")
+        except Exception as e:
+            err.error = e
+            return redirect(f"/managegame/{game_id}")
 
     @app.route("/addcharactertogame/<int:game_id>", methods = ["POST"])
     def add_character_to_game(game_id):
@@ -253,6 +278,10 @@ def configure_routes(app, db):
         if size == "1":
             size = "big"
         desciption = request.form["description"]
-        weapon_repository.create_weapon(db, name, min_damage, max_damage, attack_modifier, defence_modifier, size, desciption)
-        return redirect(f"/managegame/{game_id}")
+        try:
+            weapon_repository.create_weapon(db, name, min_damage, max_damage, attack_modifier, defence_modifier, size, desciption)
+            return redirect(f"/managegame/{game_id}")
+        except Exception as e:
+            err.error = e
+            return redirect(f"/managegame/{game_id}")
     
