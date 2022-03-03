@@ -91,4 +91,22 @@ def get_highest_maximum_damage_weapon_id_in_game(db, game_id):
     result = db.session.execute(sql, {"game_id":game_id})
     return result.fetchone()[0]
 
-    
+def get_npcs_available_for_game(db, game_id):
+    sql = "SELECT * FROM npcs n WHERE NOT EXISTS(SELECT * FROM npcsingames g WHERE n.id = g.npc_id AND g.game_id = :game_id) ORDER BY name"
+    result = db.session.execute(sql, {"game_id":game_id})
+    return result.fetchall()
+
+def add_npc_to_game(db, npc_id, game_id):
+    sql = "INSERT INTO npcsingames (npc_id, game_id) VALUES (:npc_id, :game_id)"
+    db.session.execute(sql, {"npc_id":npc_id, "game_id": game_id})
+    db.session.commit()
+
+def get_npcs_in_game(db, game_id):
+    sql = "SELECT n.* FROM npcs n, npcsingames g WHERE n.id = g.npc_id AND g.game_id = :game_id ORDER BY name"
+    result = db.session.execute(sql, {"game_id":game_id})
+    return result.fetchall()
+
+def remove_npc_from_game(db, npc_id, game_id):
+    sql = "DELETE FROM npcsingames WHERE npc_id=:npc_id AND game_id=:game_id"
+    db.session.execute(sql, {"npc_id":npc_id, "game_id":game_id})
+    db.session.commit()

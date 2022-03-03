@@ -21,6 +21,16 @@
 </ul>
 </form>
 
+<h3>Pelissä käytettävät ei-pelaajahahmot:</h3>
+<form action ="/removenpcfromgame/{{game.id}}" method = "POST">
+<ul>
+    {% for npc in npcs %}
+<li>{{ npc.name }} <button type="submit" name="npc_id" value="{{npc.id}}">Poista</button></a>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+    {% endfor %}
+</ul>
+</form>
+
 <h3>Lisää ase peliin:</h3>
 
 {% if available_weapons %}
@@ -77,4 +87,15 @@
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 
+<h3>Luo uusi ei-pelaajahahmo</h3>
+
+<form action ="/createnpc/{{game.id}}" method = "POST">
+    <p>Nimi: <input type="text" name="npc_name"> </p>
+    <p>Kuntopisteet: <input type="number" name="min_damage" default="20" placeholder ="20"></p>
+    <p>Hyökkäystaito: <input type="number" name="max_damage" default ="50" placeholder="50"></p>
+    <p>Puolustustaito: <input type="number" name="attack_modifier" default ="50" placeholder="50"></p>
+    <p>Kuvaus: <textarea name="description" rows="3", cols="50"></textarea></p>
+    <input type="submit" value="Luo">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
 {% endblock %}

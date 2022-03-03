@@ -50,6 +50,7 @@ def create_three_games_and_add_characters():
 def drop_tables():
     db.session.execute("DROP TABLE IF EXISTS playersingames;")
     db.session.execute("DROP TABLE IF EXISTS weaponsingames;")
+    db.session.execute("DROP TABLE IF EXISTS npcsingames;")
     db.session.execute("DROP TABLE IF EXISTS test;")
     db.session.execute("DROP TABLE IF EXISTS users;")
     

@@ -214,8 +214,9 @@ def configure_routes(app, db):
         weapons = game_repository.get_weapons_in_game(db, game_id)
         available_weapons = game_repository.get_weapons_available_for_game(db, game_id)
         sizes = [(0,"pieni"),(1,"iso")]
-
-        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes, error = error)
+        available_npcs = game_repository.get_npcs_available_for_game(db, game_id)
+        npcs = game_repository.get_npcs_in_game(db, game_id)
+        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes, error = error, available_npcs = available_npcs, npcs = npcs)
 
     @app.route("/addweapontogame/<int:game_id>", methods = ["POST"])
     def add_weapon_to_game(game_id):
@@ -225,6 +226,19 @@ def configure_routes(app, db):
         check_game_master(game_id)
         try:
             game_repository.add_weapon_to_game(db,request.form["weapons"], game_id)
+            return redirect(f"/managegame/{game_id}")
+        except Exception as e:
+            err.error = e
+            return redirect(f"/managegame/{game_id}")
+
+    @app.route("/addnpctogame/<int:game_id>", methods = ["POST"])
+    def add_npc_to_game(game_id):
+        if not check_user():
+            return redirect("/login")
+        check_csrf()
+        check_game_master(game_id)
+        try:
+            game_repository.add_npc_to_game(db, request.form["npcs"], game_id)
             return redirect(f"/managegame/{game_id}")
         except Exception as e:
             err.error = e
@@ -247,6 +261,16 @@ def configure_routes(app, db):
         check_game_master(game_id)
         weapon_id = request.form["weapon_id"]
         game_repository.remove_weapon_from_game(db, weapon_id, game_id)
+        return redirect(f"/managegame/{game_id}")
+
+    @app.route("/removenpcfromgame/<int:game_id>", methods = ["POST"])
+    def remove_npc_from_game(game_id):
+        if not check_user():
+            return redirect("/login")
+        check_csrf()
+        check_game_master(game_id)
+        npc_id = request.form["npc_id"]
+        game_repository.remove_npc_from_game(db, npc_id, game_id)
         return redirect(f"/managegame/{game_id}")
 
     @app.route("/leavegame/<int:game_id>", methods = ["POST"])

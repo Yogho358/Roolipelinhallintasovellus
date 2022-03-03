@@ -2,6 +2,8 @@ DROP TABLE IF EXISTS playersingames;
 
 DROP TABLE IF EXISTS weaponsingames;
 
+DROP TABLE IF EXISTS npcsingames;
+
 DROP TABLE IF EXISTS test;
 
 DROP TABLE IF EXISTS users;
@@ -28,9 +30,11 @@ CREATE TABLE weapons (id SERIAL PRIMARY KEY, name TEXT NOT NULL, min_damage INTE
 
 CREATE TABLE weaponsingames (weapon_id INTEGER REFERENCES weapons, game_id INTEGER REFERENCES games);
 
-CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL CHECK (name != ''), current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games, weapon_id INTEGER REFERENCES weapons, description TEXT);
+CREATE TABLE npcs (id SERIAL PRIMARY KEY, name TEXT NOT NULL CHECK (name != ''), current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, weapon_id INTEGER REFERENCES weapons, description TEXT);
 
-CREATE TABLE npcs (id SERIAL PRIMARY KEY, name TEXT NOT NULL CHECK (name != ''), current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games, weapon_id INTEGER REFERENCES weapons, description TEXT);
+CREATE TABLE npcsingames (npc_id INTEGER REFERENCES npcs, game_id INTEGER REFERENCES games);
+
+CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL CHECK (name != ''), current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games, weapon_id INTEGER REFERENCES weapons, description TEXT);
 
 
 INSERT INTO weapons (name, min_damage, max_damage, attack_modifier, defence_modifier, size, description) VALUES ('Pitkämiekka', 2, 6, 50, 50, 'big', 'miekka, joka on pitkä');
@@ -38,5 +42,7 @@ INSERT INTO weapons (name, min_damage, max_damage, attack_modifier, defence_modi
 INSERT INTO weapons (name, min_damage, max_damage, attack_modifier, defence_modifier, size, description) VALUES ('Perhosmiekat', 1, 5, 50, 50, 'small', 'yksi per käsi');
 
 INSERT INTO weapons (name, min_damage, max_damage, attack_modifier, defence_modifier, size, description) VALUES ('Nyrkki', 1, 2, 30, 30, 'small', 'Käsi puristettuna palloon');
+
+INSERT INTO npcs (name, current_hp, max_hp, attack_skill, defence_skill, weapon_id, description) VALUES ('Miekkamies', 20, 20, 50, 50, 1, 'Mies, jolla on miekka');
 
 
