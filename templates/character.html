@@ -39,6 +39,10 @@
     <input type="submit" value="Vaihda">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
+<form action = "/setmaxdamageweapon/{{game.id}}/{{character.id}}", method = "POST">
+    <input type="submit" value="Suurimman maksimivahingon ase">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
 
 {% endif %}
 

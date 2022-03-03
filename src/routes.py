@@ -144,8 +144,11 @@ def configure_routes(app, db):
                 healing = True
             else:
                 healing = False
-        
-            amount = int(request.form["health_value"])
+
+            amount = request.form["health_value"]
+            if len(amount) == 0:
+                amount = 0
+            amount = int(amount)
             character_repository.change_character_health(db, character.id, amount, character.current_hp, character.max_hp, healing)
 
             return redirect(f"/character/{character.id}")
@@ -165,7 +168,9 @@ def configure_routes(app, db):
         check_csrf()
         name = request.form["new_game_name"]
         try:
-            game_repository.create_game(db, name, session["user_id"])
+            game_id = game_repository.create_game(db, name, session["user_id"])
+            weapon_id = weapon_repository.get_default_weapon_id(db)
+            game_repository.add_weapon_to_game(db, weapon_id, game_id)
             return redirect("/")
         except Exception as e:
             err.error = e
@@ -284,4 +289,12 @@ def configure_routes(app, db):
         except Exception as e:
             err.error = e
             return redirect(f"/managegame/{game_id}")
-    
+
+    @app.route("/setmaxdamageweapon/<int:game_id>/<int:character_id>", methods = ["POST"])
+    def set_maximum_damage_weapon(game_id, character_id):
+        if not check_user():
+            return redirect("/login")
+        check_csrf()
+        weapon_id = game_repository.get_highest_maximum_damage_weapon_id_in_game(db, game_id)
+        character_repository.set_weapon(db, character_id, weapon_id)
+        return redirect(f"/character/{character_id}")

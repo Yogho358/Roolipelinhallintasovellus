@@ -23,7 +23,9 @@
 
 <a href="/">Etusivu</a>
 <a href="/characters">Omat hahmot</a>
+{% if session.username %}
 <a href="/logout">Kirjaudu ulos</a>
+{% endif %}
 
 {% if error %}
     <div class="error">{{ error }}</div>

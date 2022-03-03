@@ -4,6 +4,9 @@ def create_game(db, name, game_master_id):
     sql = "INSERT INTO games (name, game_master_id) VALUES (:name, :game_master_id)"
     db.session.execute(sql, {"name":name, "game_master_id":game_master_id})
     db.session.commit()
+    sql = "SELECT id FROM games WHERE name=:name"
+    result = db.session.execute(sql, {"name":name})
+    return result.fetchone()[0]
 
 def get_mastered_games(db, id):
     sql = "SELECT * FROM games WHERE game_master_id=:id ORDER BY name"
@@ -82,3 +85,10 @@ def get_number_of_players_in_game(db, game_id):
     result = db.session.execute(sql, {"game_id":game_id})
     count = result.fetchone()[0]
     return count
+
+def get_highest_maximum_damage_weapon_id_in_game(db, game_id):
+    sql = "SELECT g.weapon_id FROM weapons w, weaponsingames g WHERE w.id = g.weapon_id AND g.game_id = :game_id AND w.max_damage = (SELECT MAX(max_damage) FROM weapons w, weaponsingames g WHERE w.id=g.weapon_id AND g.game_id = :game_id)"
+    result = db.session.execute(sql, {"game_id":game_id})
+    return result.fetchone()[0]
+
+    

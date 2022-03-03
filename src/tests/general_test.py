@@ -36,7 +36,7 @@ def create_character():
 def create_weapons():
     weapons.create_weapon(db, 'Nyrkki', 1, 2, 30, 30, 'small', 'Käsi puristettuna palloon')
     weapons.create_weapon(db, "pitkämiekka", 2, 6, 50, 50, "big", "miekka,joka on pitkä")
-    weapons.create_weapon(db, 'perhosmiekat', 2, 6, 50, 50, 'big', 'yksi per käsi')
+    weapons.create_weapon(db, 'perhosmiekat', 1, 5, 50, 50, 'big', 'yksi per käsi')
     
 
 def create_three_games_and_add_characters():
@@ -54,6 +54,7 @@ def drop_tables():
     db.session.execute("DROP TABLE IF EXISTS users;")
     
     db.session.execute("DROP TABLE IF EXISTS characters;")
+    db.session.execute("DROP TABLE IF EXISTS npcs;")
     db.session.execute("DROP TABLE IF EXISTS games;")
     db.session.execute("DROP TABLE IF EXISTS weapons;")
     
@@ -73,7 +74,8 @@ class TestStuff(unittest.TestCase):
         db.session.execute("CREATE TABLE playersingames (user_id INTEGER REFERENCES users, game_id INTEGER REFERENCES games);")
         db.session.execute("CREATE TABLE weapons (id SERIAL PRIMARY KEY, name TEXT NOT NULL, min_damage INTEGER, max_damage INTEGER, attack_modifier INTEGER, defence_modifier INTEGER, size TEXT, description TEXT);")
         db.session.execute("CREATE TABLE weaponsingames (weapon_id INTEGER REFERENCES weapons, game_id INTEGER REFERENCES games);")
-        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL, current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games, weapon_id INTEGER REFERENCES weapons);")
+        db.session.execute("CREATE TABLE characters (id SERIAL PRIMARY KEY, user_id INTEGER, name TEXT NOT NULL CHECK (name != ''), current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games, weapon_id INTEGER REFERENCES weapons, description TEXT);")
+        db.session.execute("CREATE TABLE npcs (id SERIAL PRIMARY KEY, name TEXT NOT NULL CHECK (name != ''), current_hp INTEGER, max_hp INTEGER, attack_skill INTEGER, defence_skill INTEGER, game_id INTEGER REFERENCES games, weapon_id INTEGER REFERENCES weapons, description TEXT);")
         create_weapons()
 
     def tearDown(self):
@@ -315,3 +317,10 @@ class TestStuff(unittest.TestCase):
         add_3_users_to_games()
         res = games.get_number_of_players_in_game(db, 1)
         self.assertEqual(res, 2)
+
+    def test_should_get_id_for_weapon_with_max_damage_in_game(self):
+        create_3_games()
+        games.add_weapon_to_game(db, 1, 1)
+        games.add_weapon_to_game(db,3,1)
+        res = games.get_highest_maximum_damage_weapon_id_in_game(db,1)
+        self.assertEqual(res, 3)

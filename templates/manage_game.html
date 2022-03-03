@@ -19,8 +19,6 @@
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     {% endfor %}
 </ul>
-
-
 </form>
 
 <h3>Lisää ase peliin:</h3>
@@ -43,14 +41,32 @@
 
 {% endif %}
 
+<h3>Pelissä käytettävät ei-pelaajahahmot</h3>
+
+{% if available_npcs %}
+<form action = "/addnpctogame/{{game.id}}" method = "POST">
+    <select name=npcs>
+        {% for npc in available_npcs %}
+            <option value="{{ npc.id }}">{{ npc.name }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Lisää">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+    </form>
+{% else %}
+
+<p>Ei lisättäviä ei-pelaajahahmoja</p>
+
+{% endif %}
+
 <h3>Luo uusi ase</h3>
 
 <form action ="/createweapon/{{game.id}}" method = "POST">
     <p>Nimi: <input type="text" name="weapon_name"> </p>
-    <p>Minimivahinko: <input type="number" name="min_damage" default="0"></p>
-    <p>Maksimivahinko: <input type="number" name="max_damage" placeholder="0"></p>
-    <p>Hyökkäystehokkuus: <input type="number" name="attack_modifier" placeholder="0"></p>
-    <p>Puolustustehokkuus: <input type="number" name="defence_modifier" placeholder="0"></p>
+    <p>Minimivahinko: <input type="number" name="min_damage" default="0" placeholder ="0"></p>
+    <p>Maksimivahinko: <input type="number" name="max_damage" default ="0" placeholder="0"></p>
+    <p>Hyökkäystehokkuus: <input type="number" name="attack_modifier" default ="0" placeholder="0"></p>
+    <p>Puolustustehokkuus: <input type="number" name="defence_modifier" default ="0" placeholder="0"></p>
     <p>Koko: <select name="size">
         {% for size in sizes %}
             <option value = "{{size[0]}}">{{size[1]}}</option>
