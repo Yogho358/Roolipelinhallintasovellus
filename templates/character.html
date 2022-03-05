@@ -10,6 +10,9 @@
 <p> Ei ole liittynyt peliin</p>
 {% endif %}
 
+<p>Hyökkäystaito (0-100): {{character.attack_skill }}</p>
+<p>Puolustustaito (0-100): {{character.defence_skill }}</p>
+
 <p>Kunto: {{ character.current_hp }} / {{ character.max_hp }}</p>
 <form action="/character/{{ character.id }}" method = "POST">
     <p>Muokkaa kuntoa:<br>

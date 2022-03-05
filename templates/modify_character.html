@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}Hahmon muokkaus{% endblock %}
+{% block content %}
+
+<h1>{{ character.name }}</h1>
+
+<p>Muokkaa hahmon ominauisuuksia, muokkaamattomat ominaisuudet pysysvät ennallaan</p>
+
+<form action="/modifycharacter/{{character.id}}" method="POST">
+    <p>Kuntopisteet: <input type="number" name="hp" placeholder="{{character.max_hp}}"></p>
+    <p>Hyökkäystaito: <input type="number" name="attack_skill" placeholder="{{character.attack_skill}}"></p>
+    <p>Puolustustaito: <input type="number" name="defence_skill" placeholder="{{character.defence_skill}}"></p>
+    <p>Muokkaa nimeä: <input type="text" name="name" placeholder ="{{character.name}}"></p>
+    <input type="submit" value="Muokkaa">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+
+{% endblock %}

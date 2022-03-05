@@ -43,4 +43,7 @@ def set_weapon(db, character_id, weapon_id):
     db.session.execute(sql, {"weapon_id":weapon_id, "character_id":character_id})
     db.session.commit()
 
-
+def mofify_character(db, character_id, name, hp, attack_skill, defence_skill):
+    sql = "UPDATE characters SET name=:name, max_hp=:hp, attack_skill=:attack_skill, defence_skill=:defence_skill WHERE id=:character_id"
+    db.session.execute(sql, {"name":name, "hp":hp, "attack_skill":attack_skill, "defence_skill":defence_skill, "character_id":character_id})
+    db.session.commit()

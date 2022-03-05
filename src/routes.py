@@ -343,3 +343,31 @@ def configure_routes(app, db):
         weapon_id = game_repository.get_highest_maximum_damage_weapon_id_in_game(db, game_id)
         character_repository.set_weapon(db, character_id, weapon_id)
         return redirect(f"/character/{character_id}")
+
+    @app.route("/modifycharacter/<int:character_id>", methods = ["GET", "POST"])
+    def modify_character(character_id):
+        if not check_user():
+            return redirect("/login")
+        character = character_repository.get_character(db, character_id)
+        if request.method == "GET":
+            return render_template("modify_character.html", character = character)
+        if request.method == "POST":
+            check_csrf()
+            hp = request.form["hp"]
+            if not hp:
+                hp = character.max_hp
+            attack_skill = request.form["attack_skill"]
+            if not attack_skill:
+                attack_skill = character.attack_skill
+            defence_skill = request.form["defence_skill"]
+            if not defence_skill:
+                defence_skill = character.defence_skill
+            name = request.form["name"]
+            if not name:
+                name = character.name
+            try:
+                character_repository.mofify_character(db, character.id, name, hp, attack_skill, defence_skill)
+                return redirect(f"/character/{character.id}")
+            except Exception as e:
+                err.error = e
+                return redirect(f"/character/{character.id}")
