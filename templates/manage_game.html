@@ -25,7 +25,7 @@
 <form action ="/removenpcfromgame/{{game.id}}" method = "POST">
 <ul>
     {% for npc in npcs %}
-<li>{{ npc.name }} <button type="submit" name="npc_id" value="{{npc.id}}">Poista</button></a>
+<li><a href="/npc/{{npc.id}}">{{ npc.name }} </a> <button type="submit" name="npc_id" value="{{npc.id}}">Poista</button></a>
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     {% endfor %}
 </ul>

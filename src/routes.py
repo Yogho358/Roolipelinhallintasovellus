@@ -154,6 +154,30 @@ def configure_routes(app, db):
 
             return redirect(f"/character/{character.id}")
 
+    @app.route("/npc/<int:npc_id>", methods = ["GET", "POST"])
+    def show_npc(npc_id):
+        if not check_user():
+            return redirect("/login")
+        character = npc_repository.get_npc(db, npc_id)
+
+        if request.method == "GET":
+            weapon = weapon_repository.get_weapon(db, character.weapon_id)
+            return render_template("/npc.html", character = character, weapon = weapon)
+
+        if request.method == "POST":
+            check_csrf()
+            if request.form["modify_health"] == "increase":
+                healing = True
+            else:
+                healing = False
+
+            amount = request.form["health_value"]
+            if len(amount) == 0:
+                amount = 0
+            amount = int(amount)
+            npc_repository.change_npc_health(db, npc_id, amount, character.current_hp, character.max_hp, healing)
+            return redirect(f"/npc/{character.id}")
+
     @app.route("/changecharacterweapon/<int:character_id>", methods =["POST"])
     def change_character_weapon(character_id):
         if not check_user():
@@ -366,7 +390,7 @@ def configure_routes(app, db):
             if not name:
                 name = character.name
             try:
-                character_repository.mofify_character(db, character.id, name, hp, attack_skill, defence_skill)
+                character_repository.modify_character(db, character.id, name, hp, attack_skill, defence_skill)
                 return redirect(f"/character/{character.id}")
             except Exception as e:
                 err.error = e
