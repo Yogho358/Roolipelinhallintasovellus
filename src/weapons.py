@@ -24,3 +24,8 @@ def get_default_weapon_id(db):
     res = result.fetchone()
     weapon_id = res[0]
     return weapon_id
+
+def get_all_weapons(db):
+    sql = "SELECT * FROM weapons"
+    result = db.session.execute(sql)
+    return result.fetchall()

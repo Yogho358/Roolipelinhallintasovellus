@@ -1,6 +1,7 @@
 
 import unittest
 import character_repository
+import npc_repository
 import games
 import weapons
 from flask import Flask
@@ -325,3 +326,9 @@ class TestStuff(unittest.TestCase):
         games.add_weapon_to_game(db,3,1)
         res = games.get_highest_maximum_damage_weapon_id_in_game(db,1)
         self.assertEqual(res, 3)
+
+    def test_should_be_able_to_creat_npc(self):
+        npc_repository.create_npc(db, "uusi npc", 20, 50, 40, 1, "uus")
+        result = db.session.execute("SELECT * FROM npcs")
+        res = result.fetchall()
+        self.assertEqual(res[0].name, "uusi npc")

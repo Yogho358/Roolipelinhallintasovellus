@@ -1,6 +1,7 @@
 
 from tkinter import E
 from flask import redirect, render_template, request, session, abort
+import src.npc_repository as npc_repository
 import src.users as users
 import src.character_repository as character_repository
 import src.games as game_repository
@@ -216,7 +217,8 @@ def configure_routes(app, db):
         sizes = [(0,"pieni"),(1,"iso")]
         available_npcs = game_repository.get_npcs_available_for_game(db, game_id)
         npcs = game_repository.get_npcs_in_game(db, game_id)
-        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes, error = error, available_npcs = available_npcs, npcs = npcs)
+        all_weapons = weapon_repository.get_all_weapons(db)
+        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes, error = error, available_npcs = available_npcs, npcs = npcs, all_weapons = all_weapons)
 
     @app.route("/addweapontogame/<int:game_id>", methods = ["POST"])
     def add_weapon_to_game(game_id):
@@ -313,6 +315,25 @@ def configure_routes(app, db):
         except Exception as e:
             err.error = e
             return redirect(f"/managegame/{game_id}")
+
+    @app.route("/createnpc/<int:game_id>", methods = ["POST"])
+    def create_npc(game_id):
+        if not check_user():
+            return redirect("/login")
+        check_csrf()
+        name = request.form["npc_name"]
+        hp = request.form["hp"]
+        attack_skill = request.form["attack_skill"]
+        defence_skill = request.form["defence_skill"]
+        weapon_id = request.form["npc_weapon"]
+        description = request.form["description"]
+        try:
+            npc_repository.create_npc(db, name, hp, attack_skill, defence_skill, weapon_id, description)
+            return redirect(f"/managegame/{game_id}")
+        except Exception as e:
+            err.error = e
+            return redirect(f"/managegame/{game_id}")
+
 
     @app.route("/setmaxdamageweapon/<int:game_id>/<int:character_id>", methods = ["POST"])
     def set_maximum_damage_weapon(game_id, character_id):
