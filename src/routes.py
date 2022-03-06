@@ -1,5 +1,5 @@
 
-from tkinter import E
+#from tkinter import E
 from flask import redirect, render_template, request, session, abort
 import src.npc_repository as npc_repository
 import src.users as users
