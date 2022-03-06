@@ -6,10 +6,9 @@
 
 <p>Muokkaa hahmon ominaisuuksia, muokkaamattomat ominaisuudet pysysvät ennallaan</p>
 
-<form action="/modifycharacter/{{character.id}}" method="POST">
+<form action="/modifynpc/{{character.id}}" method="POST">
     <p>Kuntopisteet: <input type="number" name="hp" placeholder="{{character.max_hp}}"></p>
     <p>Hyökkäystaito: <input type="number" name="attack_skill" placeholder="{{character.attack_skill}}"></p>
-    
     <p>Puolustustaito: <input type="number" name="defence_skill" placeholder="{{character.defence_skill}}"></p>
     <p>Muokkaa kuvausta: <textarea name="description" rows="3", cols="50"></textarea></p>
     <p>Muokkaa nimeä: <input type="text" name="name" placeholder ="{{character.name}}"></p>

@@ -24,3 +24,13 @@ def change_npc_health(db, id, amount, current, max, healing):
     sql = "UPDATE npcs SET current_hp=current_hp+:amount WHERE id=:id"
     db.session.execute(sql, {"amount": amount, "id":id})
     db.session.commit()
+
+def modify_character(db, id, name, hp, attack_skill, defence_skill):
+    sql = "UPDATE npcs SET name=:name, max_hp=:hp, attack_skill=:attack_skill, defence_skill=:defence_skill WHERE id=:id"
+    db.session.execute(sql, {"name":name, "hp":hp, "attack_skill":attack_skill, "defence_skill":defence_skill, "id":id})
+    db.session.commit()
+
+def set_weapon(db, npc_id, weapon_id):
+    sql = "UPDATE npcs SET weapon_id=:weapon_id WHERE id=:npc_id"
+    db.session.execute(sql, {"weapon_id":weapon_id, "npc_id":npc_id})
+    db.session.commit()

@@ -51,7 +51,7 @@
 
 {% endif %}
 
-<h3>Pelissä käytettävät ei-pelaajahahmot</h3>
+<h3>Lisää ei-pelaajahahmo peliin</h3>
 
 {% if available_npcs %}
 <form action = "/addnpctogame/{{game.id}}" method = "POST">
@@ -60,6 +60,7 @@
             <option value="{{ npc.id }}">{{ npc.name }}</option>
         {% endfor %}
     </select>
+    <p>nimi: <input type="text" name="npc_name"></p>
     <input type="submit" value="Lisää">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     </form>

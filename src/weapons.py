@@ -26,6 +26,6 @@ def get_default_weapon_id(db):
     return weapon_id
 
 def get_all_weapons(db):
-    sql = "SELECT * FROM weapons"
+    sql = "SELECT * FROM weapons ORDER BY name"
     result = db.session.execute(sql)
     return result.fetchall()

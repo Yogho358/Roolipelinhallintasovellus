@@ -4,11 +4,6 @@
 
 <h1>{{ character.name }}</h1>
 
-{% if game %}
-<p>Pelissä: {{ game.name }}</p>
-{% else %}
-<p> Ei ole liittynyt peliin</p>
-{% endif %}
 
 <p>Hyökkäystaito (0-100): {{character.attack_skill }}</p>
 <p>Puolustustaito (0-100): {{character.defence_skill }}</p>
@@ -31,22 +26,16 @@
 </p>
 
 <h3>Vaihda asetta:</h3>
-<form action = "/changecharacterweapon/{{character.id}}", method = "POST">
+<form action = "/changenpcweapon/{{character.id}}", method = "POST">
     <select name="weapons">
-        {% for w in available_weapons %}
+        {% for w in weapons %}
             <option value="{{ w.id }}">{{ w.name }}</option>
         {% endfor %}
     </select>
     <input type="submit" value="Vaihda">
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
-<form action = "/setmaxdamageweapon/{{game.id}}/{{character.id}}", method = "POST">
-    <input type="submit" value="Suurimman maksimivahingon ase">
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-</form>
 
-
-
-<a href="/modifycharacter/{{ character.id }}">Muokkaa hahmoa</a> 
+<a href="/modifynpc/{{ character.id }}">Muokkaa hahmoa</a> 
 
 {% endblock %}

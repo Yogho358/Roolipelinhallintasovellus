@@ -162,7 +162,8 @@ def configure_routes(app, db):
 
         if request.method == "GET":
             weapon = weapon_repository.get_weapon(db, character.weapon_id)
-            return render_template("/npc.html", character = character, weapon = weapon)
+            weapons = weapon_repository.get_all_weapons(db)
+            return render_template("/npc.html", character = character, weapon = weapon, weapons = weapons)
 
         if request.method == "POST":
             check_csrf()
@@ -185,6 +186,14 @@ def configure_routes(app, db):
         check_csrf()
         character_repository.set_weapon(db,character_id, request.form["weapons"])
         return redirect(f"/character/{character_id}")
+
+    @app.route("/changenpcweapon/<int:npc_id>", methods =["POST"])
+    def change_npc_weapon(npc_id):
+        if not check_user():
+            return redirect("/login")
+        check_csrf()
+        npc_repository.set_weapon(db, npc_id, request.form["weapons"])
+        return redirect(f"/npc/{npc_id}")
 
     @app.route("/newgame", methods = ["POST"])
     def new_game():
@@ -370,12 +379,26 @@ def configure_routes(app, db):
 
     @app.route("/modifycharacter/<int:character_id>", methods = ["GET", "POST"])
     def modify_character(character_id):
+        return modify_character_npc(character_id, False, request.method)
+        
+    @app.route("/modifynpc/<int:npc_id>", methods = ["GET", "POST"])
+    def modify_npc(npc_id):
+        return modify_character_npc(npc_id, True, request.method)
+
+    def modify_character_npc(id, npc, method):
         if not check_user():
             return redirect("/login")
-        character = character_repository.get_character(db, character_id)
-        if request.method == "GET":
-            return render_template("modify_character.html", character = character)
-        if request.method == "POST":
+        if not npc:
+            character = character_repository.get_character(db, id)
+            url = "character"
+            repository = character_repository
+        else:
+            character = npc_repository.get_npc(db, id)
+            url = "npc"
+            repository = npc_repository
+        if method == "GET":
+            return render_template(f"modify_{url}.html", character = character)
+        if method == "POST":
             check_csrf()
             hp = request.form["hp"]
             if not hp:
@@ -386,12 +409,15 @@ def configure_routes(app, db):
             defence_skill = request.form["defence_skill"]
             if not defence_skill:
                 defence_skill = character.defence_skill
+            description = request.form["description"]
+            if not description:
+                description = character.description
             name = request.form["name"]
             if not name:
                 name = character.name
             try:
-                character_repository.modify_character(db, character.id, name, hp, attack_skill, defence_skill)
-                return redirect(f"/character/{character.id}")
+                repository.modify_character(db, character.id, name, hp, attack_skill, defence_skill)
+                return redirect(f"/{url}/{character.id}")
             except Exception as e:
                 err.error = e
-                return redirect(f"/character/{character.id}")
+                return redirect(f"/{url}/{character.id}")
