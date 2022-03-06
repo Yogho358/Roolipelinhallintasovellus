@@ -28,7 +28,7 @@ Sovellusta ei voi käyttää rekisteröitymättä ja kirjautumatta sisään. Kir
 
 Aseita lisätään peliin listalta, jossa on kaikki sovelluksessa olevat aseet. Pelinjohtosivulla voi luoda uusia aseita, jotka sitten voi liittää peliinsä, ja myös muut pelinjohtajat voivat liittää omiin peleihinsä.
 
-Vihollisia luodaan siten, että ensin pelinjohtosivulla luodaan vihollistyyppi. Sitten kun tyyppi valitaan liitettäväksi peliin, tietokantaan luodaan uusi tyyppiä edustava hahmo, jota pelinjohtaja sitten voi muokata. Pelinjohtajat voivat lisätä hahmoja kaikista tyypeistä, jotka joku peelinjohtaja on luonut.
+Vihollisia luodaan siten, että ensin pelinjohtosivulla luodaan vihollistyyppi. Sitten kun tyyppi valitaan liitettäväksi peliin, sovellus luo tietokantaan uuden tyyppiä edustavan hahmon, jota pelinjohtaja sitten voi muokata. Pelinjohtajat voivat lisätä hahmoja kaikista tyypeistä, jotka joku peelinjohtaja on luonut.
 
 Kun pelissä on pelaajahahmoja, vihollisia ja toivottavasti kaikille aseita, pelinjohtaja voi luoda taistelun valitsemalla osallisiksi kaikki siihen osallistuvat hahmot, ja näkee siitä yhteenvedon. Itse peliä sitten olisi tarkoitus pelata esim. nopilla, ja pelaajat sitten pitäisivät sovelluksen avulla kirjaa hahmoistaan ja pelinjohtaja vihollisistaan.
 
