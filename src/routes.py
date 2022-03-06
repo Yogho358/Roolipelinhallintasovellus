@@ -248,10 +248,10 @@ def configure_routes(app, db):
         weapons = game_repository.get_weapons_in_game(db, game_id)
         available_weapons = game_repository.get_weapons_available_for_game(db, game_id)
         sizes = [(0,"pieni"),(1,"iso")]
-        available_npcs = game_repository.get_npcs_available_for_game(db, game_id)
+        npc_templates = npc_repository.get_npc_templates(db)
         npcs = game_repository.get_npcs_in_game(db, game_id)
         all_weapons = weapon_repository.get_all_weapons(db)
-        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes, error = error, available_npcs = available_npcs, npcs = npcs, all_weapons = all_weapons)
+        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes, error = error, npc_templates = npc_templates, all_weapons = all_weapons, npcs = npcs)
 
     @app.route("/addweapontogame/<int:game_id>", methods = ["POST"])
     def add_weapon_to_game(game_id):
@@ -273,7 +273,10 @@ def configure_routes(app, db):
         check_csrf()
         check_game_master(game_id)
         try:
-            game_repository.add_npc_to_game(db, request.form["npcs"], game_id)
+            npc = npc_repository.get_npc(db, request.form["npcs"])
+            print(npc)
+            name = request.form["npc_name"]
+            npc_repository.add_npc_to_game(db, game_id, npc.template_name, name, npc.max_hp, npc.attack_skill, npc.defence_skill, npc.weapon_id, npc.description)
             return redirect(f"/managegame/{game_id}")
         except Exception as e:
             err.error = e
@@ -305,7 +308,7 @@ def configure_routes(app, db):
         check_csrf()
         check_game_master(game_id)
         npc_id = request.form["npc_id"]
-        game_repository.remove_npc_from_game(db, npc_id, game_id)
+        npc_repository.delete_npc(db, npc_id)
         return redirect(f"/managegame/{game_id}")
 
     @app.route("/leavegame/<int:game_id>", methods = ["POST"])
@@ -354,14 +357,15 @@ def configure_routes(app, db):
         if not check_user():
             return redirect("/login")
         check_csrf()
-        name = request.form["npc_name"]
+        template_name = request.form["npc_name"]
+        name = f"{template_name}_template"
         hp = request.form["hp"]
         attack_skill = request.form["attack_skill"]
         defence_skill = request.form["defence_skill"]
         weapon_id = request.form["npc_weapon"]
         description = request.form["description"]
         try:
-            npc_repository.create_npc(db, name, hp, attack_skill, defence_skill, weapon_id, description)
+            npc_repository.create_npc(db,template_name, name, hp, attack_skill, defence_skill, weapon_id, description)
             return redirect(f"/managegame/{game_id}")
         except Exception as e:
             err.error = e

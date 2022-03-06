@@ -52,12 +52,12 @@
 {% endif %}
 
 <h3>Lisää ei-pelaajahahmo peliin</h3>
-
-{% if available_npcs %}
+<p>Valitese malli ja anna nimi:</p>
+{% if npc_templates %}
 <form action = "/addnpctogame/{{game.id}}" method = "POST">
     <select name=npcs>
-        {% for npc in available_npcs %}
-            <option value="{{ npc.id }}">{{ npc.name }}</option>
+        {% for npc in npc_templates %}
+            <option value="{{ npc.id }}">{{ npc.template_name }}</option>
         {% endfor %}
     </select>
     <p>nimi: <input type="text" name="npc_name"></p>
@@ -88,10 +88,10 @@
     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
 </form>
 
-<h3>Luo uusi ei-pelaajahahmo</h3>
+<h3>Luo uusi ei-pelaajahahmomalli</h3>
 
 <form action ="/createnpc/{{game.id}}" method = "POST">
-    <p>Nimi: <input type="text" name="npc_name"> </p>
+    <p>Mallin nimi: <input type="text" name="npc_name"> </p>
     <p>Kuntopisteet: <input type="number" name="hp" default="20" placeholder ="20"></p>
     <p>Hyökkäystaito: <input type="number" name="attack_skill" default ="50" placeholder="50"></p>
     <p>Puolustustaito: <input type="number" name="defence_skill" default ="50" placeholder="50"></p>
