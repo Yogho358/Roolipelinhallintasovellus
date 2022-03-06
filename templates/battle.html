@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block title %}Peli{% endblock %}
+{% block content %}
+
+<p>Pelaajahahmot:</p>
+<ul>
+{% if pcs %}
+{% for pc in pcs %}
+<p>
+    <li>{{pc.name}}: kunto {{pc.current_hp}}/{{pc.max_hp}}, Hyökkäystaito: {{pc.attack_skill}} Puolustustaito: {{pc.defence_skill}} <p>Ase: {% for weapon in pc_weapons %}
+                                                                                                                                        {% if weapon.id == pc.weapon_id %}
+                                                                                                                                            {{weapon.name}}, vahinko: {{weapon.min_damage}} - {{weapon.max_damage}}, Hyökkäystehokkuus: {{weapon.attack_modifier}} Puolustustehokkuus: {{weapon.defence_modifier}}, {{weapon.description}} </p>
+                                                                                                                                        {% endif %}
+                                                                                                                                            {% endfor %}
+    </li>
+</p>
+{% endfor %}
+
+
+{% endif %}
+</ul>
+{% if easiest_pc_targets %}
+<p>Helpoimmat kohteet (Huonoin puolustustaito + aseen tuoma puolustusetu):</p>
+<ul>
+    
+    {% for pc in easiest_pc_targets %}
+        <li>{{pc.name}}</li>
+        {% endfor %}
+</ul>
+{% endif %}
+
+<p>Ei-pelaajahahmot</p>
+<ul>
+    {% if npcs %}
+{% for npc in npcs %}
+<p>
+    <li>{{npc.name}}: kunto {{npc.current_hp}}/{{npc.max_hp}}, Hyökkäystaito: {{npc.attack_skill}} Puolustustaito: {{npc.defence_skill}} <p> Ase: {% for weapon in npc_weapons %}
+                                                                                                                                        {% if weapon.id == npc.weapon_id %}
+                                                                                                                                            {{weapon.name}}, vahinko: {{weapon.min_damage}} - {{weapon.max_damage}}, Hyökkäystehokkuus: {{weapon.attack_modifier}} Puolustustehokkuus: {{weapon.defence_modifier}}, {{weapon.description}} </p> 
+                                                                                                                                        {% endif %}
+                                                                                                                                            {% endfor %}
+    </li>
+</p>
+{% endfor %}
+{% endif %}
+</ul>
+
+{% if easiest_npc_targets %}
+<p>Helpoimmat kohteet (Huonoin puolustustaito + aseen tuoma puolustusetu):</p>
+<ul>
+    
+    {% for npc in easiest_npc_targets %}
+        <li>{{npc.name}}</li>
+        {% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}

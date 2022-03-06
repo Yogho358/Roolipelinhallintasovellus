@@ -47,3 +47,17 @@ def modify_character(db, character_id, name, hp, attack_skill, defence_skill):
     sql = "UPDATE characters SET name=:name, max_hp=:hp, attack_skill=:attack_skill, defence_skill=:defence_skill WHERE id=:character_id"
     db.session.execute(sql, {"name":name, "hp":hp, "attack_skill":attack_skill, "defence_skill":defence_skill, "character_id":character_id})
     db.session.commit()
+
+def get_characters_based_on_ids(db, ids):
+    ids = tuple(ids)
+    sql = "SELECT * FROM characters WHERE id IN :ids"
+    result = db.session.execute(sql, {"ids":ids})
+    return result.fetchall()
+
+def get_easiest_target_pc(db, ids):
+    sql = "SELECT * FROM characters c WHERE id IN :ids AND ((SELECT defence_modifier FROM weapons WHERE id = c.weapon_id)+(c.defence_skill))=(SELECT MIN(c.defence_skill + (SELECT defence_modifier FROM weapons WHERE id = c.weapon_id)) FROM characters c WHERE id IN :ids)"
+    result = db.session.execute(sql, {"ids":tuple(ids)})
+    return result.fetchall()
+    
+
+

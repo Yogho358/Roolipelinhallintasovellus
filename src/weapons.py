@@ -1,3 +1,6 @@
+
+
+
 def create_weapon(db, name, min_damage, max_damage, attack_modifier, defence_modifier, size, description):
     if len(name) == 0:
         raise Exception("Täytyy antaa nimi")
@@ -28,4 +31,14 @@ def get_default_weapon_id(db):
 def get_all_weapons(db):
     sql = "SELECT * FROM weapons ORDER BY name"
     result = db.session.execute(sql)
+    return result.fetchall()
+
+def get_pc_weapons_in_battle(db, ids):
+    sql = "SELECT * FROM weapons WHERE id IN (SELECT weapon_id FROM characters WHERE id IN :ids)"
+    result = db.session.execute(sql, {"ids":tuple(ids)})
+    return result.fetchall()
+
+def get_npc_weapons_in_battle(db, ids):
+    sql = "SELECT * FROM weapons WHERE id IN (SELECT weapon_id FROM npcs WHERE id IN :ids)"
+    result = db.session.execute(sql, {"ids":tuple(ids)})
     return result.fetchall()

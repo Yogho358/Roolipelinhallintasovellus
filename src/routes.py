@@ -251,7 +251,8 @@ def configure_routes(app, db):
         npc_templates = npc_repository.get_npc_templates(db)
         npcs = game_repository.get_npcs_in_game(db, game_id)
         all_weapons = weapon_repository.get_all_weapons(db)
-        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes, error = error, npc_templates = npc_templates, all_weapons = all_weapons, npcs = npcs)
+        characters_in_game = game_repository.get_all_characters_in_game(db, game_id)
+        return render_template("manage_game.html", game = game, players = players, weapons = weapons, available_weapons = available_weapons, sizes = sizes, error = error, npc_templates = npc_templates, all_weapons = all_weapons, npcs = npcs, characters_in_game = characters_in_game)
 
     @app.route("/addweapontogame/<int:game_id>", methods = ["POST"])
     def add_weapon_to_game(game_id):
@@ -425,3 +426,38 @@ def configure_routes(app, db):
             except Exception as e:
                 err.error = e
                 return redirect(f"/{url}/{character.id}")
+
+    @app.route("/createbattle/<int:game_id>")
+    def create_battle(game_id):
+        if not check_user():
+            return redirect("/login")
+        check_game_master(game_id)  
+        pcs = game_repository.get_all_characters_in_game(db, game_id)
+        npcs = game_repository.get_npcs_in_game(db, game_id)
+        return render_template("create_battle.html", pcs = pcs, npcs = npcs)
+
+        
+
+    @app.route("/createbattle", methods = ["POST"])
+    def battle():
+        check_csrf()
+        pc_ids = request.form.getlist("pc")
+        if pc_ids:
+            pcs = character_repository.get_characters_based_on_ids(db, pc_ids)
+            pc_weapons = weapon_repository.get_pc_weapons_in_battle(db, pc_ids)
+            easiest_pc_targets = character_repository.get_easiest_target_pc(db, pc_ids)
+        else:
+            pcs = None
+            pc_weapons = None
+            easiest_pc_targets = None
+        npc_ids = request.form.getlist("npc")
+        if npc_ids:
+           npcs = npc_repository.get_npcs_based_on_ids(db, npc_ids)
+           npc_weapons = weapon_repository.get_npc_weapons_in_battle(db, npc_ids)
+           easiest_npc_targets = npc_repository.get_easiest_target_npc(db, npc_ids)
+        else:
+            npcs = None
+            npc_weapons = None
+            easiest_npc_targets = None
+        
+        return render_template("battle.html", pcs = pcs, npcs = npcs, pc_weapons = pc_weapons, npc_weapons = npc_weapons, easiest_pc_targets = easiest_pc_targets, easiest_npc_targets = easiest_npc_targets)

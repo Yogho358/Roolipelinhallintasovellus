@@ -54,3 +54,14 @@ def delete_npc(db, id):
     sql = "DELETE FROM npcs WHERE id=:id"
     db.session.execute(sql, {"id":id})
     db.session.commit()
+
+def get_npcs_based_on_ids(db, ids):
+    ids = tuple(ids)
+    sql = "SELECT * FROM npcs WHERE id IN :ids"
+    result = db.session.execute(sql, {"ids":ids})
+    return result.fetchall()
+
+def get_easiest_target_npc(db, ids):
+    sql = "SELECT * FROM npcs n WHERE id IN :ids AND ((SELECT defence_modifier FROM weapons WHERE id = n.weapon_id)+(n.defence_skill))=(SELECT MIN(n.defence_skill + (SELECT defence_modifier FROM weapons WHERE id = n.weapon_id)) FROM npcs n WHERE id IN :ids)"
+    result = db.session.execute(sql, {"ids":tuple(ids)})
+    return result.fetchall()

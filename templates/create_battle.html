@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Peli{% endblock %}
+{% block content %}
+
+Pelaajahahmot:
+
+<form action="/createbattle" method = "POST">
+<ul>
+    {% for pc in pcs %}
+        <li><input type="checkbox" name="pc" value="{{ pc.id }}"> {{ pc.name }} </li>
+    {% endfor %}
+</ul>
+
+Ei-pelaajahahmot:
+
+<ul>
+    {% for npc in npcs %}
+        <li><input type="checkbox" name="npc" value="{{npc.id}}"> {{ npc.name }}</li>
+    {% endfor %}
+</ul>
+<input type="submit" value="Luo">
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+</form>
+
+
+{% endblock %}
