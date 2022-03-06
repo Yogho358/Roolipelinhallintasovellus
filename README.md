@@ -16,6 +16,23 @@ Pelinjohtaja voi:
 * Luoda vihollisia, aseita, taitoja ja areenoita
 * Luoda taistelutilanteita yhdistelemällä pelihahmoja, vihollisia ja areenoita, jolloin hän saa tietoja kuinka areena vaikuttaa pelihahmojen aseisiin ja taitoihin
 
+# Loppupalautus
+
+Sovellus on edelleen osoitteessa https://powerful-cliffs-38993.herokuapp.com/.
+
+Sovellus nykykunnossaan jokseenkin vastaa suunnitelmaa, paitsi ajanpuutteen takia taitosysteemiä ei ole tehty, ja taisteluyhteenveto ei ole viimeistelty. Molemmat asiat saisi suhteellisen pienellä vaivalla toteutettua, tulisivat käyttämään samoja tekniikoita mitä sovelluksessa on jo nyt, eikä mitään uusia tapoja käyttää tietokantaa yms. tarvittaisi.
+
+# Käyttöohje
+
+Sovellusta ei voi käyttää rekisteröitymättä ja kirjautumatta sisään. Kirjautumisen jälkeen käyttäjt voivat luoda hahmoja ja muokata niiden ominaisuuksia. Pelaajan roolissa olevilla käyttäjillä ei ole juuri muuta tekemistä kuin seurata ja muokata omia hahmojaan, ja liittyä peleihin. Hahmo voi olla liittynyt vain yhteen peliin. Peliin liittyäkseen jonkun on ensin luotava sellainen. Kaikki käyttäjät voivat luoda pelejä. Pelin luoja johtaa peliä, ja hän voi päättää, millaisia aseita ja vihollisia pelissä on. Pelaajat eivät voi vaihtaa asetta ennnenkuin ovat pelissä, koska uuden aseen voi valita vain aseista, jotka pelinjohtaja on liittänyt peliin.
+
+Aseita lisätään peliin listalta, jossa on kaikki sovelluksessa olevat aseet. Pelinjohtosivulla voi luoda uusia aseita, jotka sitten voi liittää peliinsä, ja myös muut pelinjohtajat voivat liittää omiin peleihinsä.
+
+Vihollisia luodaan siten, että ensin pelinjohtosivulla luodaan vihollistyyppi. Sitten kun tyyppi valitaan liitettäväksi peliin, tietokantaan luodaan uusi tyyppiä edustava hahmo, jota pelinjohtaja sitten voi muokata. Pelinjohtajat voivat lisätä hahmoja kaikista tyypeistä, jotka joku peelinjohtaja on luonut.
+
+Kun pelissä on pelaajahahmoja, vihollisia ja toivottavasti kaikille aseita, pelinjohtaja voi luoda taistelun valitsemalla osallisiksi kaikki siihen osallistuvat hahmot, ja näkee siitä yhteenvedon. Itse peliä sitten olisi tarkoitus pelata esim. nopilla, ja pelaajat sitten pitäisivät sovelluksen avulla kirjaa hahmoistaan ja pelinjohtaja vihollisistaan.
+
+
 # Välipalautus 1
 
 Sovellus on osoitteessa https://powerful-cliffs-38993.herokuapp.com/
